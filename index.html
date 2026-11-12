@@ -159,6 +159,7 @@ h2{font-size:17px}
 /* day / month stepper */
 .dp{display:flex;gap:8px;align-items:center;margin-bottom:12px}
 .dp input{flex:1;text-align:center}
+.dw{position:relative;flex:1;min-width:130px}.dw>input[type=text]{width:100%;text-align:center;cursor:pointer}.dw .dov{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;opacity:0!important;margin:0!important;padding:0!important;cursor:pointer}
 .ib{flex:none;width:44px;height:44px;border-radius:50%;border:1px solid var(--ln);background:var(--sf);color:var(--ac);font-size:26px;line-height:1;display:grid;place-items:center;padding:0;cursor:pointer}
 /* meal cards with +/- steppers */
 .mc{background:var(--bg);border-radius:16px;padding:12px;margin-bottom:10px}
@@ -256,6 +257,10 @@ button:focus-visible,summary:focus-visible,a.btn:focus-visible{outline:2px solid
 <script>
 const bn=n=>String(n).replace(/\d/g,d=>'০১২৩৪৫৬৭৮৯'[d]);
 const WD=['রবিবার','সোমবার','মঙ্গলবার','বুধবার','বৃহস্পতিবার','শুক্রবার','শনিবার'];
+const dm=d=>d?bn(d.slice(8,10)+'/'+d.slice(5,7)+'/'+d.slice(0,4)):'';
+// তারিখ বাছাইয়ের ঘর: ফোনের ভাষা যাই হোক, সবসময় দিন/মাস/বছর দেখায়
+const dinp=(id,v,oc,wd)=>`<div class="dw"><input type="text" readonly id="${id}t" value="${wd?dmy(v):dm(v)}"><input type="date" class="dov" id="${id}" value="${v}" onclick="try{this.showPicker()}catch(e){}" onchange="${oc||'dov(this)'}"></div>`;
+function dov(el){const t=document.getElementById(el.id+'t');if(t)t.value=dm(el.value)}
 const dmy=d=>bn(d.slice(8,10)+'/'+d.slice(5,7)+'/'+d.slice(0,4))+' ('+WD[new Date(d+'T00:00:00').getDay()]+')';
 const f2=n=>bn((Math.round(n*100)/100).toFixed(2).replace(/\.00$/,''));
 const ymd=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
@@ -333,7 +338,7 @@ function calc(m){
 
 /* ---------- views ---------- */
 const shiftD=n=>{const d=new Date(D+'T00:00:00');d.setDate(d.getDate()+n);D=ymd(d);render()};
-const dpick=()=>`<div class="dp"><button class="ib" onclick="shiftD(-1)" aria-label="আগের দিন">‹</button><input type="date" value="${D}" onchange="D=this.value||D;render()"><button class="ib" onclick="shiftD(1)" aria-label="পরের দিন">›</button></div>`;
+const dpick=()=>`<div class="dp"><button class="ib" onclick="shiftD(-1)" aria-label="আগের দিন">‹</button>${dinp('dpk',D,'D=this.value||D;render()',1)}<button class="ib" onclick="shiftD(1)" aria-label="পরের দিন">›</button></div>`;
 const isLk=(dd,id)=>!!(dd.locked||(dd.lk&&dd.lk[id]));
 function vMeal(){
   const dd=day(D);let tl=0,tn=0;
@@ -348,7 +353,7 @@ function vMeal(){
 function unlockMember(id){const dd=day(D);dd.locked=false;dd.lk=dd.lk||{};dd.lk[id]=false;save();render()}
 function stp(id,i,d){const dd=day(D);const a=(dd.meals[id]||[0,0]).slice();a[i]=Math.max(0,(+a[i]||0)+d);dd.meals[id]=a;save();const e=document.getElementById('v-'+id+'-'+i);if(e)e.textContent=bn(a[i])}
 function setMeal(id,i,v){if(isLk(day(D),id))return;const a=day(D).meals[id]||[0,0];a[i]=Math.max(0,+v||0);day(D).meals[id]=a;save()}
-function saveMember(id){if(confirm(mem(id).name+'-এর '+bn(D)+' তারিখের মিল সেভ করবেন? সেভ করার পর আর পরিবর্তন করা যাবে না।')){const dd=day(D);dd.lk=dd.lk||{};dd.lk[id]=true;save();render()}}
+function saveMember(id){if(confirm(mem(id).name+'-এর '+dmy(D)+' তারিখের মিল সেভ করবেন? সেভ করার পর আর পরিবর্তন করা যাবে না।')){const dd=day(D);dd.lk=dd.lk||{};dd.lk[id]=true;save();render()}}
 function vMenu(){
   const dd=day(D);
   return `<div class="card"><h2>${dl(D)} মেনু</h2>
@@ -406,11 +411,11 @@ function vBazar(){
   const list=S.bazar.filter(b=>b.date.startsWith(M)).sort((a,b)=>b.date.localeCompare(a.date));
   const tot=list.reduce((a,b)=>a+b.amt,0);
   return monthPick()+`<div class="card"><h2>বাজার যোগ করুন</h2>
-  <div class="row"><input type="date" id="bd" value="${today()}"><input id="bi" placeholder="কী কী কেনা হলো" style="flex:1;min-width:140px"></div>
+  <div class="row">${dinp('bd',today())}<input id="bi" placeholder="কী কী কেনা হলো" style="flex:1;min-width:140px"></div>
   <div class="row"><input id="ba" type="number" inputmode="decimal" min="0" placeholder="টাকা" style="width:100px"><select id="bb" onchange="bazM=this.value" style="flex:1">${S.members.map(x=>`<option value="${x.id}" ${bazM===x.id?'selected':''}>${esc(x.name)}</option>`).join('')}</select></div>
   <button class="btn" style="width:100%" onclick="addBazar()">যোগ করুন</button></div>
   <div class="card"><h2>এই মাসের বাজার — ৳${f2(tot)}</h2>
-  ${list.map(b=>li(esc(b.item),bn(b.date.slice(5))+' · '+esc(mem(b.by).name),'৳'+f2(b.amt),'bazar',b.id)).join('')||'<div class="empty">এখনো কোনো বাজার নেই</div>'}</div>`;
+  ${list.map(b=>li(esc(b.item),dm(b.date)+' · '+esc(mem(b.by).name),'৳'+f2(b.amt),'bazar',b.id)).join('')||'<div class="empty">এখনো কোনো বাজার নেই</div>'}</div>`;
 }
 function addBazar(){const a=+bazarV('ba');if(!a)return;S.bazar.push({id:uid(),date:bazarV('bd'),item:bazarV('bi')||'বাজার',amt:a,by:bazarV('bb')});save();render()}
 const bazarV=i=>document.getElementById(i).value;
@@ -424,8 +429,8 @@ function vAcc(){
   return `<div class="row"><label>বিগত মাস (যে মাসের হিসাব করছেন): <input type="month" value="${M}" onchange="M=this.value;render()"></label></div>
   <div class="card"><h2>${mn(M)} মাসে খাবার বাবদ জমা</h2>
   <div class="row"><select id="dm" onchange="depM=this.value" style="flex:1">${S.members.map(x=>`<option value="${x.id}" ${depM===x.id?'selected':''}>${esc(x.name)}</option>`).join('')}</select><input id="da" type="number" inputmode="decimal" min="0" placeholder="টাকা" style="width:100px"></div>
-  <div class="row"><input id="dd" type="date" value="${today()}"><button class="btn" onclick="addDep()">জমা নিন</button></div>
-  ${dep.map(d=>li(esc(mem(d.mid).name),bn(d.date.slice(5)),'৳'+f2(d.amt),'deposits',d.id)).join('')||'<div class="empty">কোনো জমা নেই</div>'}</div>
+  <div class="row">${dinp('dd',today())}<button class="btn" onclick="addDep()">জমা নিন</button></div>
+  ${dep.map(d=>li(esc(mem(d.mid).name),dm(d.date),'৳'+f2(d.amt),'deposits',d.id)).join('')||'<div class="empty">কোনো জমা নেই</div>'}</div>
   <div class="card"><h2>খরচ যোগ করুন</h2>
   <div class="row"><select id="ek" onchange="exK=this.value" style="flex:1"><option value="x" ${exK==='x'?'selected':''}>বিগত মাস (${mn(M)}) — আনুষাঙ্গিক খরচ</option><option value="n" ${exK==='n'?'selected':''}>চলতি মাস (${mn(nxt(M))}) — বিল (ভাড়া, গ্যাস, নেট…)</option></select></div>
   <div class="row"><input id="en" list="el" placeholder="খরচের নাম" style="flex:1;min-width:130px"><datalist id="el"><option>বাসা ভাড়া<option>গ্যাস বিল<option>ইন্টারনেট বিল<option>পানি বিল<option>বুয়া বিল<option>বিদ্যুৎ বিল<option>ময়লা বিল<option>মেরামত<option>অন্যান্য</datalist><input id="ea" type="number" inputmode="decimal" min="0" placeholder="টাকা" style="width:100px"></div>
