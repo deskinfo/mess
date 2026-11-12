@@ -8,7 +8,7 @@
 <script src="config.js"></script>
 <meta name="theme-color" content="#0e6b5c">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
-<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -294,6 +294,7 @@ function syncRole(){if(!CLOUD){role='manager';return}
   if(role&&window.cloudReady){try{localStorage.setItem('role',role)}catch(e){}}}
 const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}if(CLOUD&&role==='manager'&&(!S.managerId||S.managerId===me)&&window.cloud&&window.cloudReady)window.cloud.push()};
 const uid=()=>Math.random().toString(36).slice(2,8);
+const isM=()=>role==='manager';
 const mem=id=>S.members.find(m=>m.id===id)||{name:'?'};
 const day=d=>S.days[d]||(S.days[d]={menu:{l:'',n:''},meals:{}});
 const ICON={
@@ -350,18 +351,18 @@ function vMeal(){
   ${S.members.length?`<div class="sum"><div><b>${bn(tl)}</b><span>দুপুর</span></div><div><b>${bn(tn)}</b><span>রাত</span></div><div><b>${bn(tl+tn)}</b><span>মোট</span></div></div>${rows}`:'<p class="note">আগে “আরও → সদস্য” থেকে সদস্য যোগ করুন, বা সদস্যদের সাইন আপ করতে বলুন।</p>'}
   <p class="note">ম্যানেজার হিসেবে আপনি সেভ হয়ে যাওয়া মিলও + / − দিয়ে বদলাতে পারবেন। সদস্য নিজে বদলাতে চাইলে “আবার খুলে দিন” চাপুন।</p></div>`;
 }
-function unlockMember(id){const dd=day(D);dd.locked=false;dd.lk=dd.lk||{};dd.lk[id]=false;save();render()}
-function stp(id,i,d){const dd=day(D);const a=(dd.meals[id]||[0,0]).slice();a[i]=Math.max(0,(+a[i]||0)+d);dd.meals[id]=a;save();const e=document.getElementById('v-'+id+'-'+i);if(e)e.textContent=bn(a[i])}
-function setMeal(id,i,v){if(isLk(day(D),id))return;const a=day(D).meals[id]||[0,0];a[i]=Math.max(0,+v||0);day(D).meals[id]=a;save()}
-function saveMember(id){if(confirm(mem(id).name+'-এর '+dmy(D)+' তারিখের মিল সেভ করবেন? সেভ করার পর আর পরিবর্তন করা যাবে না।')){const dd=day(D);dd.lk=dd.lk||{};dd.lk[id]=true;save();render()}}
+function unlockMember(id){if(!isM())return;const dd=day(D);dd.locked=false;dd.lk=dd.lk||{};dd.lk[id]=false;save();render()}
+function stp(id,i,d){if(!isM())return;const dd=day(D);const a=(dd.meals[id]||[0,0]).slice();a[i]=Math.max(0,(+a[i]||0)+d);dd.meals[id]=a;save();const e=document.getElementById('v-'+id+'-'+i);if(e)e.textContent=bn(a[i])}
+function setMeal(id,i,v){if(!isM())return;if(isLk(day(D),id))return;const a=day(D).meals[id]||[0,0];a[i]=Math.max(0,+v||0);day(D).meals[id]=a;save()}
+function saveMember(id){if(!isM())return;if(confirm(mem(id).name+'-এর '+dmy(D)+' তারিখের মিল সেভ করবেন? সেভ করার পর আর পরিবর্তন করা যাবে না।')){const dd=day(D);dd.lk=dd.lk||{};dd.lk[id]=true;save();render()}}
 function vMenu(){
   const dd=day(D);
   return `<div class="card"><h2>${dl(D)} মেনু</h2>
   ${dd.menuSaved?`<p>দুপুর: ${esc(dd.menu.l)||'—'}<br>রাত: ${esc(dd.menu.n)||'—'}</p><button class="btn alt" onclick="editMenu()">এডিট করুন</button>`
   :`<div class="row"><input id="ml" placeholder="দুপুরের মেনু" style="flex:1" value="${esc(dd.menu.l)}"></div><div class="row"><input id="mnn" placeholder="রাতের মেনু" style="flex:1" value="${esc(dd.menu.n)}"></div><button class="btn" onclick="saveMenu()">সেভ করুন</button>`}</div>`;
 }
-function saveMenu(){const dd=day(D);dd.menu.l=bazarV('ml');dd.menu.n=bazarV('mnn');dd.menuSaved=true;save();render()}
-function editMenu(){day(D).menuSaved=false;save();render()}
+function saveMenu(){if(!isM())return;const dd=day(D);dd.menu.l=bazarV('ml');dd.menu.n=bazarV('mnn');dd.menuSaved=true;save();render()}
+function editMenu(){if(!isM())return;day(D).menuSaved=false;save();render()}
 function vWam(){
   const dd=day(D),pend=S.members.filter(x=>!isLk(dd,x.id)).length;
   return `<div class="card"><h2>হোয়াটস্যাপে পাঠান</h2>
@@ -410,17 +411,17 @@ async function dlDay(){const b=await dayBlob();if(await nativeShare(b,'meal-'+D+
 function vBazar(){
   const list=S.bazar.filter(b=>b.date.startsWith(M)).sort((a,b)=>b.date.localeCompare(a.date));
   const tot=list.reduce((a,b)=>a+b.amt,0);
-  return monthPick()+`<div class="card"><h2>বাজার যোগ করুন</h2>
+  return monthPick()+(isM()?`<div class="card"><h2>বাজার লিখুন</h2>
   <div class="row">${dinp('bd',today())}<input id="bi" placeholder="কী কী কেনা হলো" style="flex:1;min-width:140px"></div>
   <div class="row"><input id="ba" type="number" inputmode="decimal" min="0" placeholder="টাকা" style="width:100px"><select id="bb" onchange="bazM=this.value" style="flex:1">${S.members.map(x=>`<option value="${x.id}" ${bazM===x.id?'selected':''}>${esc(x.name)}</option>`).join('')}</select></div>
-  <button class="btn" style="width:100%" onclick="addBazar()">যোগ করুন</button></div>
+  <button class="btn" style="width:100%" onclick="addBazar()">সেভ করুন</button><p class="note">সেভ করার পর বাজার আর এডিট বা মোছা যাবে না।</p></div>`:'')+`
   <div class="card"><h2>এই মাসের বাজার — ৳${f2(tot)}</h2>
   ${list.map(b=>li(esc(b.item),dm(b.date)+' · '+esc(mem(b.by).name),'৳'+f2(b.amt),'bazar',b.id)).join('')||'<div class="empty">এখনো কোনো বাজার নেই</div>'}</div>`;
 }
-function addBazar(){const a=+bazarV('ba');if(!a)return;S.bazar.push({id:uid(),date:bazarV('bd'),item:bazarV('bi')||'বাজার',amt:a,by:bazarV('bb')});save();render()}
+function addBazar(){if(!isM())return;const a=+bazarV('ba');if(!a){alert('টাকার পরিমাণ লিখুন');return}if(!confirm('বাজার সেভ করবেন? সেভ করার পর আর এডিট বা মোছা যাবে না।'))return;S.bazar.push({id:uid(),date:bazarV('bd'),item:bazarV('bi')||'বাজার',amt:a,by:bazarV('bb'),locked:true});save();render()}
 const bazarV=i=>document.getElementById(i).value;
-const li=(t,sub,amt,k,id)=>`<div class="li"><div class="li-m"><b>${t}</b>${sub?`<span>${sub}</span>`:''}</div>${amt!==''?`<div class="li-a">${amt}</div>`:''}<button class="x" aria-label="মুছুন" onclick="del('${k}','${id}')">×</button></div>`;
-function del(k,id){if(!confirm('মুছে ফেলবেন?'))return;S[k]=S[k].filter(x=>x.id!==id);save();render()}
+const li=(t,sub,amt,k,id)=>`<div class="li"><div class="li-m"><b>${t}</b>${sub?`<span>${sub}</span>`:''}</div>${amt!==''?`<div class="li-a">${amt}</div>`:''}${isM()&&k!=='bazar'?`<button class="x" aria-label="মুছুন" onclick="del('${k}','${id}')">×</button>`:''}</div>`;
+function del(k,id){if(!isM()||k==='bazar')return;if(!confirm('মুছে ফেলবেন?'))return;S[k]=S[k].filter(x=>x.id!==id);save();render()}
 
 let exK='x',depM='',bazM='';
 function vAcc(){
@@ -428,19 +429,19 @@ function vAcc(){
   const lst=k=>ex.filter(e=>(e.k==='n')===(k==='n')).map(e=>li(esc(e.name),'','৳'+f2(e.amt),'extras',e.id)).join('')||'<div class="empty">কিছু নেই</div>';
   return `<div class="row"><label>বিগত মাস (যে মাসের হিসাব করছেন): <input type="month" value="${M}" onchange="M=this.value;render()"></label></div>
   <div class="card"><h2>${mn(M)} মাসে খাবার বাবদ জমা</h2>
-  <div class="row"><select id="dm" onchange="depM=this.value" style="flex:1">${S.members.map(x=>`<option value="${x.id}" ${depM===x.id?'selected':''}>${esc(x.name)}</option>`).join('')}</select><input id="da" type="number" inputmode="decimal" min="0" placeholder="টাকা" style="width:100px"></div>
-  <div class="row">${dinp('dd',today())}<button class="btn" onclick="addDep()">জমা নিন</button></div>
+  ${isM()?`<div class="row"><select id="dm" onchange="depM=this.value" style="flex:1">${S.members.map(x=>`<option value="${x.id}" ${depM===x.id?'selected':''}>${esc(x.name)}</option>`).join('')}</select><input id="da" type="number" inputmode="decimal" min="0" placeholder="টাকা" style="width:100px"></div>
+  <div class="row">${dinp('dd',today())}<button class="btn" onclick="addDep()">জমা নিন</button></div>`:''}
   ${dep.map(d=>li(esc(mem(d.mid).name),dm(d.date),'৳'+f2(d.amt),'deposits',d.id)).join('')||'<div class="empty">কোনো জমা নেই</div>'}</div>
-  <div class="card"><h2>খরচ যোগ করুন</h2>
-  <div class="row"><select id="ek" onchange="exK=this.value" style="flex:1"><option value="x" ${exK==='x'?'selected':''}>বিগত মাস (${mn(M)}) — আনুষাঙ্গিক খরচ</option><option value="n" ${exK==='n'?'selected':''}>চলতি মাস (${mn(nxt(M))}) — বিল (ভাড়া, গ্যাস, নেট…)</option></select></div>
+  <div class="card"><h2>${isM()?'খরচ যোগ করুন':'খরচ'}</h2>
+  ${isM()?`<div class="row"><select id="ek" onchange="exK=this.value" style="flex:1"><option value="x" ${exK==='x'?'selected':''}>বিগত মাস (${mn(M)}) — আনুষাঙ্গিক খরচ</option><option value="n" ${exK==='n'?'selected':''}>চলতি মাস (${mn(nxt(M))}) — বিল (ভাড়া, গ্যাস, নেট…)</option></select></div>
   <div class="row"><input id="en" list="el" placeholder="খরচের নাম" style="flex:1;min-width:130px"><datalist id="el"><option>বাসা ভাড়া<option>গ্যাস বিল<option>ইন্টারনেট বিল<option>পানি বিল<option>বুয়া বিল<option>বিদ্যুৎ বিল<option>ময়লা বিল<option>মেরামত<option>অন্যান্য</datalist><input id="ea" type="number" inputmode="decimal" min="0" placeholder="টাকা" style="width:100px"></div>
   <button class="btn" style="width:100%" onclick="addEx()">যোগ করুন</button>
-  <p class="note">সব খরচ মোট সদস্য সংখ্যা দিয়ে সমান ভাগ হবে।</p>
+  <p class="note">সব খরচ মোট সদস্য সংখ্যা দিয়ে সমান ভাগ হবে।</p>`:''}
   <div class="sh">বিগত মাস (${mn(M)}) — আনুষাঙ্গিক খরচ</div>${lst('x')}
   <div class="sh">চলতি মাস (${mn(nxt(M))}) — বিল</div>${lst('n')}</div>`;
 }
-function addDep(){const a=+bazarV('da');if(!a)return;S.deposits.push({id:uid(),mid:bazarV('dm'),amt:a,date:bazarV('dd')});save();render()}
-function addEx(){const a=+bazarV('ea');if(!a)return;S.extras.push({id:uid(),name:bazarV('en')||'খরচ',amt:a,month:M,k:bazarV('ek')});save();render()}
+function addDep(){if(!isM())return;const a=+bazarV('da');if(!a)return;S.deposits.push({id:uid(),mid:bazarV('dm'),amt:a,date:bazarV('dd')});save();render()}
+function addEx(){if(!isM())return;const a=+bazarV('ea');if(!a)return;S.extras.push({id:uid(),name:bazarV('en')||'খরচ',amt:a,month:M,k:bazarV('ek')});save();render()}
 
 const bOpen=new Set();
 const tgB=(id,o)=>{o?bOpen.add(id):bOpen.delete(id)};
@@ -454,16 +455,16 @@ function vBill(){
   <div><b>৳${f2(c.xT/c.n)}</b><span>আনুষাঙ্গিক খরচ, জনপ্রতি (মোট ৳${f2(c.xT)})</span></div>
   <div><b>৳${f2(c.nT/c.n)}</b><span>${B}-এর বিল, জনপ্রতি (মোট ৳${f2(c.nT)})</span></div></div></div>
   <div class="card"><h2>${B} মাসের খাবার বাবদ জমা</h2>
-  <div class="row"><input id="nda" type="number" inputmode="decimal" min="0" placeholder="সবার জন্য টাকা" style="flex:1"><button class="btn alt" onclick="allND()">সবাইকে বসান</button></div>
-  ${S.members.map(x=>`<div class="row"><span style="flex:1;min-width:0;overflow-wrap:anywhere">${esc(x.name)}</span><input type="number" inputmode="decimal" min="0" value="${nd[x.id]||''}" onchange="setND('${x.id}',this.value)" style="width:120px"></div>`).join('')}</div>
+  ${isM()?`<div class="row"><input id="nda" type="number" inputmode="decimal" min="0" placeholder="সবার জন্য টাকা" style="flex:1"><button class="btn alt" onclick="allND()">সবাইকে বসান</button></div>`:''}
+  ${S.members.map(x=>`<div class="row"><span style="flex:1;min-width:0;overflow-wrap:anywhere">${esc(x.name)}</span>${isM()?`<input type="number" inputmode="decimal" min="0" value="${nd[x.id]||''}" onchange="setND('${x.id}',this.value)" style="width:120px">`:`<b>৳${f2(+nd[x.id]||0)}</b>`}</div>`).join('')}</div>
   <div class="card"><h2>জনপ্রতি হিসাব</h2><p class="note" style="margin-top:-6px">নামে চাপলে বিস্তারিত ও পাঠানোর বাটন দেখা যাবে।</p>
   ${c.rows.map(r=>{const neg=r.total<0;return `<details class="pc" ${bOpen.has(r.m.id)?'open':''} ontoggle="tgB('${r.m.id}',this.open)"><summary><span class="pc-n">${esc(r.m.name)}</span><span class="pc-t ${neg?'ok':'due'}">${neg?'<small>ফেরত</small>':''}৳${f2(Math.abs(r.total))}</span></summary>
   ${kv('মিল',bn(r.meals))}${kv('খাবার খরচ','৳'+f2(r.food))}${kv(A+' জমা','৳'+f2(r.dep))}${kv('ঘাটতি / অবশিষ্ট',(r.net>0?'+':'−')+f2(Math.abs(r.net)),r.net>0?'due':'ok')}${kv('আনুষাঙ্গিক','৳'+f2(r.xS))}${kv(B+' বিল','৳'+f2(r.nS))}${kv(B+' খাবার জমা','৳'+f2(r.next))}${kv(neg?'ফেরত পাবেন':'মোট দিতে হবে','৳'+f2(Math.abs(r.total)),neg?'ok':'due')}
   <div class="row"><button class="btn wa" onclick="sendBill('${r.m.id}')">হোয়াটসঅ্যাপে পাঠান</button><button class="btn alt" onclick="dlBill('${r.m.id}')">ছবি সেভ করুন</button></div></details>`}).join('')}
   <p class="note">মোট = (মিল × রেট − জমা) + আনুষাঙ্গিক ভাগ + ${B}-এর বিলের ভাগ + ${B}-এর খাবার জমা। জমার চেয়ে খাবার কম খেলে অবশিষ্ট টাকা সব হিসাবের শেষে বাদ যায়, বেশি খেলে ঘাটতি যোগ হয়।</p></div>`;
 }
-function setND(id,v){S.nd[M]=S.nd[M]||{};S.nd[M][id]=Math.max(0,+v||0);save();render()}
-function allND(){const v=+bazarV('nda')||0;S.nd[M]={};S.members.forEach(x=>S.nd[M][x.id]=v);save();render()}
+function setND(id,v){if(!isM())return;S.nd[M]=S.nd[M]||{};S.nd[M][id]=Math.max(0,+v||0);save();render()}
+function allND(){if(!isM())return;const v=+bazarV('nda')||0;S.nd[M]={};S.members.forEach(x=>S.nd[M][x.id]=v);save();render()}
 function billLines(r,c){
   const A=mn(M),B=mn(nxt(M)),L=[];
   L.push({h:`১। ${A} মাসের খাবার হিসাব`});
@@ -536,33 +537,34 @@ async function sendBill(id){
 }
 
 function vMem(){
-  return `<div class="card"><h2>সদস্য যোগ করুন</h2><p class="note" style="margin-top:-6px">সদস্যরা নিজেরাও সাইন আপ করলে এখানে যুক্ত হয়ে যায়। চাইলে আপনি নিজেও যোগ করতে পারেন।</p><div class="row"><input id="mn" placeholder="নাম" style="flex:1;min-width:120px"></div><div class="row"><input id="mp" type="tel" inputmode="tel" placeholder="হোয়াটসঅ্যাপ নম্বর (01XXXXXXXXX)" style="flex:1"></div><button class="btn" style="width:100%" onclick="addMem()">যোগ করুন</button>
-  <div style="margin-top:10px">${S.members.map(x=>`<div class="li"><div class="li-m"><b>${esc(x.name)}${x.id===S.managerId?' <span class="ok" style="font-size:13px">· ম্যানেজার</span>':''}</b>${x.phone?`<span>${esc(x.phone)}</span>`:''}</div><button class="x" aria-label="মুছুন" onclick="delMem('${x.id}')">×</button></div>`).join('')}</div></div>
-  <div class="card"><h2>ব্যাকআপ</h2><p class="note">তথ্য এই ফোনে জমা থাকে। মাঝে মাঝে ব্যাকআপ নিয়ে রাখুন, ফোন বদলালে বা অ্যাপ মুছে ফেললে ফিরিয়ে আনতে পারবেন।</p>
-  <div class="row"><button class="btn alt" onclick="exp()">ব্যাকআপ নামান</button><label class="btn alt" style="display:inline-flex;align-items:center">ব্যাকআপ ফেরত আনুন<input type="file" accept=".json" hidden onchange="imp(this.files[0])"></label></div></div>`;
+  const add=isM()?`<h2>সদস্য যোগ করুন</h2><p class="note" style="margin-top:-6px">সদস্যরা নিজেরাও সাইন আপ করলে এখানে যুক্ত হয়ে যায়। চাইলে আপনি নিজেও যোগ করতে পারেন।</p><div class="row"><input id="mn" placeholder="নাম" style="flex:1;min-width:120px"></div><div class="row"><input id="mp" type="tel" inputmode="tel" placeholder="হোয়াটসঅ্যাপ নম্বর (01XXXXXXXXX)" style="flex:1"></div><button class="btn" style="width:100%" onclick="addMem()">যোগ করুন</button>`:'<h2>সদস্য তালিকা</h2>';
+  return `<div class="card">${add}
+  <div style="margin-top:10px">${S.members.map(x=>`<div class="li"><div class="li-m"><b>${esc(x.name)}${x.id===S.managerId?' <span class="ok" style="font-size:13px">· ম্যানেজার</span>':''}</b>${x.phone?`<span>${esc(x.phone)}</span>`:''}</div>${isM()?`<button class="x" aria-label="মুছুন" onclick="delMem('${x.id}')">×</button>`:''}</div>`).join('')}</div></div>
+  ${isM()?`<div class="card"><h2>ব্যাকআপ</h2><p class="note">তথ্য এই ফোনে জমা থাকে। মাঝে মাঝে ব্যাকআপ নিয়ে রাখুন, ফোন বদলালে বা অ্যাপ মুছে ফেললে ফিরিয়ে আনতে পারবেন।</p>
+  <div class="row"><button class="btn alt" onclick="exp()">ব্যাকআপ নামান</button><label class="btn alt" style="display:inline-flex;align-items:center">ব্যাকআপ ফেরত আনুন<input type="file" accept=".json" hidden onchange="imp(this.files[0])"></label></div></div>`:''}`;
 }
-function addMem(){const n=bazarV('mn').trim();if(!n)return;const ph=bazarV('mp');if(pk(ph).length>=10&&S.members.some(x=>pk(x.phone)===pk(ph))){alert('এই নম্বরের সদস্য আগে থেকেই আছে');return}S.members.push({id:uid(),name:n,phone:bazarV('mp')});save();render()}
-function delMem(id){if(id===S.managerId){alert('ইনি এখন ম্যানেজার। আগে অন্য কাউকে ম্যানেজার করুন, তারপর মুছুন।');return}if(confirm('এই সদস্য মুছে ফেলবেন?')){S.members=S.members.filter(x=>x.id!==id);save();render()}}
+function addMem(){if(!isM())return;const n=bazarV('mn').trim();if(!n)return;const ph=bazarV('mp');if(pk(ph).length>=10&&S.members.some(x=>pk(x.phone)===pk(ph))){alert('এই নম্বরের সদস্য আগে থেকেই আছে');return}S.members.push({id:uid(),name:n,phone:bazarV('mp')});save();render()}
+function delMem(id){if(!isM())return;if(id===S.managerId){alert('ইনি এখন ম্যানেজার। আগে অন্য কাউকে ম্যানেজার করুন, তারপর মুছুন।');return}if(confirm('এই সদস্য মুছে ফেলবেন?')){S.members=S.members.filter(x=>x.id!==id);save();render()}}
 function exp(){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(S)],{type:'application/json'}));a.download='mess-backup.json';a.click()}
-function imp(f){if(!f)return;f.text().then(t=>{try{S=JSON.parse(t);save();render()}catch(e){alert('ফাইলটি পড়া যায়নি')}})}
+function imp(f){if(!f||!isM())return;f.text().then(t=>{try{S=JSON.parse(t);save();render()}catch(e){alert('ফাইলটি পড়া যায়নি')}})}
 
 let cookForm=false;
 const esc=t=>String(t||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 function vCook(){
-  const list=S.cooks.map(c=>`<div class="card"><div class="row"><b style="flex:1;font-size:18px">${esc(c.name)}</b><button class="x" onclick="delCook('${c.id}')">×</button></div>
+  const list=S.cooks.map(c=>`<div class="card"><div class="row"><b style="flex:1;font-size:18px">${esc(c.name)}</b>${isM()?`<button class="x" onclick="delCook('${c.id}')">×</button>`:''}</div>
   <table><tr><td class="note">মোবাইল নম্বর</td><td>${esc(c.phone)||'—'}</td></tr><tr><td class="note">স্থায়ী ঠিকানা</td><td style="white-space:normal">${esc(c.perm)||'—'}</td></tr><tr><td class="note">বর্তমান ঠিকানা</td><td style="white-space:normal">${esc(c.cur)||'—'}</td></tr></table>
-  ${c.phone?`<div class="row" style="margin-top:8px"><a class="btn alt" style="text-decoration:none" href="tel:${esc(c.phone)}">কল করুন</a></div>`:''}</div>`).join('')||'<div class="card"><p class="note">এখনো কোনো তথ্য নেই। নিচের “তথ্য সংযোজন করুন” বাটনে চাপুন।</p></div>';
+  ${c.phone?`<div class="row" style="margin-top:8px"><a class="btn alt" style="text-decoration:none" href="tel:${esc(c.phone)}">কল করুন</a></div>`:''}</div>`).join('')||'<div class="card"><p class="note">এখনো কোনো তথ্য নেই।'+(isM()?' নিচের “তথ্য সংযোজন করুন” বাটনে চাপুন।':'')+'</p></div>';
   return `${list}
-  <button class="btn" style="width:100%" onclick="cookForm=!cookForm;render()">তথ্য সংযোজন করুন</button>
-  ${cookForm?`<div class="card" style="margin-top:12px"><h2>নতুন তথ্য</h2>
+  ${isM()?`<button class="btn" style="width:100%" onclick="cookForm=!cookForm;render()">তথ্য সংযোজন করুন</button>`:''}
+  ${isM()&&cookForm?`<div class="card" style="margin-top:12px"><h2>নতুন তথ্য</h2>
   <div class="row"><input id="cn" placeholder="বুয়ার নাম" style="flex:1"></div>
   <div class="row"><input id="cp" type="tel" placeholder="মোবাইল নম্বর" style="flex:1"></div>
   <div class="row"><input id="cm" placeholder="স্থায়ী ঠিকানা" style="flex:1"></div>
   <div class="row"><input id="cc" placeholder="বর্তমান ঠিকানা" style="flex:1"></div>
   <div class="row"><button class="btn" onclick="addCook()">সেভ করুন</button><button class="btn alt" onclick="cookForm=false;render()">বাতিল</button></div></div>`:''}`;
 }
-function addCook(){const n=bazarV('cn').trim();if(!n){alert('বুয়ার নাম লিখুন');return}S.cooks.push({id:uid(),name:n,phone:bazarV('cp').trim(),perm:bazarV('cm').trim(),cur:bazarV('cc').trim()});cookForm=false;save();render()}
-function delCook(id){if(confirm('এই তথ্য মুছে ফেলবেন?')){S.cooks=S.cooks.filter(c=>c.id!==id);save();render()}}
+function addCook(){if(!isM())return;const n=bazarV('cn').trim();if(!n){alert('বুয়ার নাম লিখুন');return}S.cooks.push({id:uid(),name:n,phone:bazarV('cp').trim(),perm:bazarV('cm').trim(),cur:bazarV('cc').trim()});cookForm=false;save();render()}
+function delCook(id){if(!isM())return;if(confirm('এই তথ্য মুছে ফেলবেন?')){S.cooks=S.cooks.filter(c=>c.id!==id);save();render()}}
 
 function vLogin(){
   const up=authMode==='up';
@@ -596,12 +598,20 @@ function vMy(){
   const dd=day(D),lk=isLk(dd,me),mine=S.members.find(x=>x.id===me);
   const a0=dd.meals[me]||[0,0];
   const cell=i=>`<div class="sg"><span>${i?'রাত':'দুপুর'}</span>${lk?`<b class="big1">${bn(+a0[i]||0)}</b>`:`<div class="st"><button type="button" onclick="stpMe(${i},-1)" aria-label="কমান">−</button><b id="v-me-${i}">${bn(+a0[i]||0)}</b><button type="button" onclick="stpMe(${i},1)" aria-label="বাড়ান">+</button></div>`}</div>`;
-  const others=S.members.filter(x=>x.id!==me).map(x=>{const a=dd.meals[x.id]||[0,0];return `<div class="li"><div class="li-m"><b>${esc(x.name)}</b><span>দুপুর ${bn(+a[0]||0)} · রাত ${bn(+a[1]||0)}</span></div></div>`}).join('');
+  const others=S.members.filter(x=>x.id!==me).map(x=>{const a=dd.meals[x.id]||[0,0];return `<div class="li"><div class="li-m"><b>${esc(x.name)}${isLk(dd,x.id)?' <span class="ok" style="font-size:13px">✓</span>':''}</b><span>দুপুর ${bn(+a[0]||0)} · রাত ${bn(+a[1]||0)}</span></div></div>`}).join('');
   return `<div class="card"><h2>${mine?esc(mine.name)+', আপনার':'আপনার'} মিল</h2>${dpick()}
-  ${lk?'<p class="ok">ম্যানেজার এই দিনের মিল সেভ করে দিয়েছেন, আর বদলানো যাবে না।</p>':'<p class="note">দুপুর ও রাতের মিল + / − দিয়ে ঠিক করুন, নিজে থেকেই সেভ হবে। ম্যানেজার সেভ না করা পর্যন্ত বদলাতে পারবেন।</p>'}
-  <div class="mc"><div class="mc-b">${cell(0)}${cell(1)}</div></div>${mgrName()?`<p class="note">মিল ম্যানেজার: ${mgrName()}। সেভ হয়ে যাওয়া মিল বদলাতে চাইলে তাকে জানান।</p>`:''}</div>
+  ${lk?'<p class="ok">✓ আপনার এই দিনের মিল সেভ হয়েছে। বদলাতে চাইলে ম্যানেজারকে জানান।</p>':'<p class="note">দুপুর ও রাতের মিল + / − দিয়ে ঠিক করে “সেভ করুন” চাপুন। সেভ করার পর শুধু ম্যানেজার বদলাতে পারবেন।</p>'}
+  <div class="mc"><div class="mc-b">${cell(0)}${cell(1)}</div>${lk?'':'<button class="btn" style="width:100%" onclick="saveMine()">সেভ করুন</button>'}</div>${mgrName()?`<p class="note">মিল ম্যানেজার: ${mgrName()}</p>`:''}</div>
   <div class="card"><h2>অন্যদের মিল</h2>${others||'<div class="empty">আর কোনো সদস্য নেই</div>'}</div>
-  <div class="card"><h2>মেনু</h2><p>দুপুর: ${esc(dd.menu.l)||'—'}<br>রাত: ${esc(dd.menu.n)||'—'}</p></div>`;
+  <div class="card"><h2>${dl(D)} মেনু</h2><p>দুপুর: ${esc(dd.menu.l)||'—'}<br>রাত: ${esc(dd.menu.n)||'—'}</p></div>`;
+}
+function saveMine(){
+  if(!me||isLk(day(D),me))return;
+  if(!confirm(dmy(D)+' তারিখের আপনার মিল সেভ করবেন? সেভ করার পর শুধু ম্যানেজার বদলাতে পারবেন।'))return;
+  const dd=day(D);dd.lk=dd.lk||{};dd.lk[me]=true;const a=(dd.meals[me]||[0,0]).slice();dd.meals[me]=a;
+  if(window.cloud)window.cloud.lock(D,me,a);
+  try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}
+  render();
 }
 function stpMe(i,d){if(!me||isLk(day(D),me))return;const a=(day(D).meals[me]||[0,0]).slice();a[i]=Math.max(0,(+a[i]||0)+d);day(D).meals[me]=a;if(window.cloud)window.cloud.meal(D,me,a);const e=document.getElementById('v-me-'+i);if(e)e.textContent=bn(a[i])}
 function myMeal(i,v){if(!me||isLk(day(D),me))return;const a=(day(D).meals[me]||[0,0]).slice();a[i]=Math.max(0,+v||0);day(D).meals[me]=a;if(window.cloud)window.cloud.meal(D,me,a)}
@@ -610,7 +620,7 @@ const mgrName=()=>{const m=S.members.find(x=>x.id===S.managerId);return m?esc(m.
 function vMgr(){
   const cur=S.managerId;
   return `<div class="card"><h2>মিল ম্যানেজার সিলেক্ট করুন</h2>
-  <p class="note">যাকে ম্যানেজার করবেন, তিনি সব কিছু এডিট করতে পারবেন: সেভ হয়ে যাওয়া মিল বদলানো বা খুলে দেওয়া, বাজার, জমা-খরচ, সদস্য, মেনু ও মাসিক হিসাব। বাকিরা শুধু নিজের মিল দিতে পারবেন। এডিট করা যাবে শুধু ম্যানেজারের ফোনের অ্যাপ থেকে।</p>
+  <p class="note">যাকে ম্যানেজার করবেন, তিনি সব কিছু এডিট করতে পারবেন: সেভ হয়ে যাওয়া মিল বদলানো বা খুলে দেওয়া, বাজার, জমা-খরচ, সদস্য, মেনু ও মাসিক হিসাব। বাকিরা সব কিছু দেখতে পারবেন, শুধু নিজের মিল দিয়ে সেভ করতে পারবেন। এডিট করা যাবে শুধু ম্যানেজারের ফোনের অ্যাপ থেকে।</p>
   ${CLOUD?'':'<p class="due">এই সুবিধা ক্লাউড (Firebase) চালু থাকলে কাজ করে, তখন সদস্যরা নিজের ফোনে সাইন আপ করে ঢুকবেন।</p>'}
   ${S.members.map(x=>`<button class="lr" ${(CLOUD&&role==='manager'&&(!cur||cur===me))?'':'disabled'} onclick="pickMgr('${x.id}')"><i>${ICON.users}</i><span>${esc(x.name)}<small class="note" style="display:block">${esc(x.phone||'নম্বর নেই')}</small></span>${cur===x.id?'<em class="ok" style="font-size:14px;font-weight:700">ম্যানেজার ✓</em>':'<em>›</em>'}</button>`).join('')||'<div class="empty">আগে সদস্য যোগ করুন বা সাইন আপ করান</div>'}</div>`;
 }
@@ -633,12 +643,12 @@ function render(){
   const sm=document.querySelector('header small');if(sm)sm.textContent=(CLOUD&&!window.cloudReady)?'সিঙ্ক হচ্ছে…':'মেস ম্যানেজার';
   syncRole();
   const mgr=role==='manager';
-  if(mgr)renderNav();else nav.innerHTML='';
-  document.body.classList.toggle('hasnav',mgr);
-  document.getElementById('ttl').textContent=!role?'স্বাগতম':!mgr?'আমার মিল':TTL[tab];
+  if(role)renderNav();else nav.innerHTML='';
+  document.body.classList.toggle('hasnav',!!role);
+  document.getElementById('ttl').textContent=!role?'স্বাগতম':TTL[tab];
   document.getElementById('hr').innerHTML=(CLOUD&&role&&!mgr)?'<button class="btn alt" style="min-height:36px;padding:4px 12px;color:inherit;background:rgba(255,255,255,.2);border-color:rgba(255,255,255,.45)" onclick="logout()">বের হন</button>':'';
   const back=(tab==='mem'||tab==='cook'||tab==='mgr')?'<button class="back" onclick="go(\'more\')">‹ আরও</button>':'';
-  document.getElementById('app').innerHTML=!role?vLogin():!mgr?vMy():back+{meal:()=>vMeal()+vMenu()+vWam(),bazar:vBazar,acc:vAcc,bill:vBill,more:vMore,mgr:vMgr,mem:vMem,cook:vCook}[tab]();
+  document.getElementById('app').innerHTML=!role?vLogin():back+{meal:()=>mgr?vMeal()+vMenu()+vWam():vMy(),bazar:vBazar,acc:vAcc,bill:vBill,more:vMore,mgr:vMgr,mem:vMem,cook:vCook}[tab]();
 }
 if(navigator.storage&&navigator.storage.persist)navigator.storage.persist().catch(()=>{});
 if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
@@ -654,6 +664,7 @@ if(window.FB&&FB.apiKey){
     window.cloud={
       push(){F.setDoc(ref,JSON.parse(JSON.stringify(S))).catch(e=>alert('সেভ হয়নি: '+e.message))},
       meal(d,id,a){F.updateDoc(ref,new F.FieldPath('days',d,'meals',id),a).catch(e=>alert('সেভ হয়নি: '+e.message))},
+      lock(d,id,a){F.updateDoc(ref,new F.FieldPath('days',d,'meals',id),a,new F.FieldPath('days',d,'lk',id),true).catch(e=>alert('সেভ হয়নি: '+e.message))},
       enter(name,phone,mode){
         return F.runTransaction(db,async tx=>{
           const snap=await tx.get(ref),d=snap.exists()?snap.data():{},ms=(d.members||[]).slice(),key=pk(phone);
