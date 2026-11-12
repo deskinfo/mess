@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="bn" data-theme="glass1">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>মেস ম্যানেজার</title>
+<link rel="manifest" href="manifest.webmanifest">
+<script src="config.js"></script>
+<meta name="theme-color" content="#0e6b5c">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="format-detection" content="telephone=no">
+<meta name="apple-mobile-web-app-title" content="মেস ম্যানেজার">
+<link href="https://fonts.maateen.me/kalpurush/font.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#edf1fa;--sf:#fff;--ink:#14213d;--mut:#5a6785;--ln:#d3dcee;--ac:#1f4fb5;--ac2:#f2b630;--bad:#b3392f;--good:#1b7a45;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+*{box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 "Kalpurush","Hind Siliguri",system-ui,sans-serif}
+header{background:var(--ac);color:#fff;padding:12px 16px}
+header h1{margin:0;font-size:22px}header small{opacity:.85}
+main{max-width:760px;margin:0 auto;padding:12px 12px 24px}
+.card{background:var(--sf);border:1px solid var(--ln);border-radius:10px;padding:14px;margin-bottom:14px}
+h2{margin:0 0 10px;font-size:18px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:8px}
+input,select,textarea{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--ln);border-radius:6px;padding:7px 9px;min-width:0}
+input:focus,select:focus,textarea:focus,button:focus-visible{outline:2px solid var(--ac2);outline-offset:1px}
+textarea{width:100%;min-height:150px}
+.btn{background:var(--ac);color:#fff;border:0;border-radius:6px;padding:8px 14px;font:inherit;font-weight:600;cursor:pointer}
+.btn.alt{background:transparent;color:var(--ac);border:1px solid var(--ac)}
+.btn.wa{background:#1f9d55}
+.x{background:none;border:0;color:var(--bad);cursor:pointer;font-size:18px}
+.sc{overflow-x:auto}table{width:100%;border-collapse:collapse}
+th,td{padding:7px 6px;border-bottom:1px solid var(--ln);text-align:left;white-space:nowrap}
+th{color:var(--mut);font-weight:500;font-size:14px}td.n,th.n{text-align:right}
+.mi{width:58px;text-align:center}
+.big{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px}
+.big div{background:var(--bg);border-radius:8px;padding:10px}.big b{display:block;font-size:22px}.big span{color:var(--mut);font-size:14px}
+.due{color:var(--bad);font-weight:700}.ok{color:var(--good);font-weight:700}
+.note{color:var(--mut);font-size:14px}
+.tot td{font-weight:700;border-top:2px solid var(--ink)}
+:root[data-theme^="glass"]{--bg:rgba(255,255,255,.3);--sf:rgba(255,255,255,.3);--ink:#0f1230;--mut:#31345a;--ln:rgba(255,255,255,.5);--ac:#2563ff;--ac2:#ff9500;--bad:#c8102e;--good:#0f7a3a}
+:root[data-theme^="glass"] body{min-height:100vh;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Kalpurush","Hind Siliguri",system-ui,sans-serif}
+:root[data-theme^="glass"] body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none}
+:root[data-theme="glass1"] body{background:linear-gradient(135deg,#dbe9ff,#eadbff 50%,#ffdfe9) fixed}
+:root[data-theme="glass1"] body::before{background:radial-gradient(circle 50vmax at 15% 18%,rgba(80,210,255,.55),transparent),radial-gradient(circle 48vmax at 86% 14%,rgba(170,110,255,.45),transparent),radial-gradient(circle 52vmax at 82% 82%,rgba(255,120,170,.5),transparent),radial-gradient(circle 46vmax at 14% 86%,rgba(255,190,120,.5),transparent)}
+:root[data-theme="glass4"] body{background:linear-gradient(160deg,#ffe6d1,#ffd1dc 55%,#ffe9b8) fixed}
+:root[data-theme="glass4"] body::before{background:radial-gradient(circle 52vmax at 16% 18%,rgba(255,154,92,.5),transparent),radial-gradient(circle 48vmax at 88% 18%,rgba(255,111,145,.45),transparent),radial-gradient(circle 50vmax at 80% 86%,rgba(255,200,87,.5),transparent),radial-gradient(circle 40vmax at 12% 84%,rgba(255,140,170,.38),transparent)}
+:root[data-theme^="glass"] header{margin:10px 12px 0;padding:14px 18px 12px;border-radius:26px;color:var(--ink);background:linear-gradient(135deg,rgba(255,255,255,.55),rgba(255,255,255,.2));-webkit-backdrop-filter:blur(14px) saturate(170%) brightness(1.05);backdrop-filter:blur(14px) saturate(170%) brightness(1.05);border:1px solid rgba(255,255,255,.65);box-shadow:inset 0 1.5px 1px rgba(255,255,255,.95),inset 0 -1.5px 1px rgba(255,255,255,.45),inset 1.5px 0 1px rgba(255,255,255,.6),inset -1.5px 0 1px rgba(255,255,255,.4),inset 3px 3px 6px rgba(0,200,255,.08),inset -3px -3px 6px rgba(255,60,140,.07),inset 0 0 26px rgba(255,255,255,.28),0 14px 34px rgba(20,25,40,.22)}
+:root[data-theme^="glass"] header h1{font-size:24px;font-weight:700;letter-spacing:-.2px}
+:root[data-theme^="glass"] header small{color:var(--mut);opacity:1}
+:root[data-theme^="glass"] header select{border-radius:999px;padding:7px 14px;color:var(--ink);background:linear-gradient(180deg,rgba(255,255,255,.8),rgba(255,255,255,.35));border:1px solid rgba(255,255,255,.9);box-shadow:inset 0 1.5px 1px #fff,inset 0 -2px 4px rgba(255,255,255,.4),0 6px 14px rgba(20,25,40,.2)}
+:root[data-theme^="glass"] nav{margin:12px 12px 4px;padding:5px;gap:3px;border-radius:999px;background:linear-gradient(135deg,rgba(255,255,255,.5),rgba(255,255,255,.18));-webkit-backdrop-filter:blur(14px) saturate(170%) brightness(1.05);backdrop-filter:blur(14px) saturate(170%) brightness(1.05);border:1px solid rgba(255,255,255,.65);box-shadow:inset 0 1.5px 1px rgba(255,255,255,.95),inset 0 -1.5px 1px rgba(255,255,255,.45),inset 1.5px 0 1px rgba(255,255,255,.6),inset -1.5px 0 1px rgba(255,255,255,.4),inset 3px 3px 6px rgba(0,200,255,.08),inset -3px -3px 6px rgba(255,60,140,.07),inset 0 0 26px rgba(255,255,255,.28),0 12px 30px rgba(20,25,40,.2);scrollbar-width:none}
+:root[data-theme^="glass"] nav::-webkit-scrollbar{display:none}
+:root[data-theme^="glass"] nav button{color:var(--ink);opacity:.85;border:0;border-radius:999px;padding:8px 14px;font-weight:600}
+:root[data-theme^="glass"] nav button.on{opacity:1;color:var(--ac);background:linear-gradient(180deg,rgba(255,255,255,.98),rgba(255,255,255,.55));box-shadow:inset 0 1.5px 1px #fff,inset 0 -2px 5px rgba(255,255,255,.5),0 4px 12px rgba(20,25,40,.25)}
+:root[data-theme^="glass"] .card{position:relative;isolation:isolate;border-radius:28px;padding:16px;background:linear-gradient(135deg,rgba(255,255,255,.55) 0%,rgba(255,255,255,.22) 42%,rgba(255,255,255,.18) 66%,rgba(255,255,255,.4) 100%);-webkit-backdrop-filter:blur(14px) saturate(170%) brightness(1.05);backdrop-filter:blur(14px) saturate(170%) brightness(1.05);border:1px solid rgba(255,255,255,.55);box-shadow:inset 0 1.5px 1px rgba(255,255,255,.95),inset 0 -1.5px 1px rgba(255,255,255,.45),inset 1.5px 0 1px rgba(255,255,255,.6),inset -1.5px 0 1px rgba(255,255,255,.4),inset 3px 3px 6px rgba(0,200,255,.08),inset -3px -3px 6px rgba(255,60,140,.07),inset 0 0 26px rgba(255,255,255,.28),0 18px 40px rgba(20,25,40,.16),0 3px 8px rgba(20,25,40,.1),0 30px 36px -26px rgba(255,255,255,.9)}
+:root[data-theme^="glass"] .card::before{content:"";position:absolute;z-index:-1;inset:0;border-radius:inherit;pointer-events:none;background:linear-gradient(112deg,rgba(255,255,255,.55) 0%,rgba(255,255,255,.16) 11%,transparent 24%),linear-gradient(112deg,transparent 58%,rgba(255,255,255,.22) 60%,rgba(255,255,255,.06) 66%,transparent 70%),linear-gradient(180deg,rgba(255,255,255,.35) 0%,transparent 14%)}
+:root[data-theme^="glass"] .card::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;padding:1.5px;background:linear-gradient(135deg,#fff 0%,rgba(255,255,255,.15) 28%,rgba(255,255,255,.04) 55%,rgba(255,255,255,.5) 82%,#fff 100%);-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask:linear-gradient(#000 0 0) content-box exclude,linear-gradient(#000 0 0)}
+:root[data-theme^="glass"] .big div{border-radius:20px;background:linear-gradient(150deg,rgba(255,255,255,.6),rgba(255,255,255,.2));border:1px solid rgba(255,255,255,.65);box-shadow:inset 0 1.5px 1px rgba(255,255,255,.95),inset 0 -2px 6px rgba(255,255,255,.3),0 6px 14px rgba(20,25,40,.12)}
+:root[data-theme^="glass"] th,:root[data-theme^="glass"] td{border-bottom:1px solid rgba(255,255,255,.55);box-shadow:0 1px 0 rgba(20,25,40,.1)}
+:root[data-theme^="glass"] .tot td{border-top:1px solid rgba(15,18,48,.5)}
+:root[data-theme^="glass"] input,:root[data-theme^="glass"] select,:root[data-theme^="glass"] textarea{border-radius:14px;background:rgba(255,255,255,.28);border:1px solid rgba(255,255,255,.7);box-shadow:inset 0 3px 7px rgba(20,25,40,.2),inset 0 -1px 0 rgba(255,255,255,.7)}
+:root[data-theme^="glass"] header select{border-radius:999px}
+:root[data-theme^="glass"] .btn{border-radius:999px;padding:9px 18px;border:1px solid rgba(255,255,255,.6);background:linear-gradient(180deg,rgba(255,255,255,.55) 0%,rgba(255,255,255,.08) 48%,rgba(255,255,255,0) 50%),rgba(37,99,255,.82);box-shadow:inset 0 1.5px 1px rgba(255,255,255,.9),inset 0 -3px 6px rgba(255,255,255,.2),0 8px 18px rgba(37,99,255,.45)}
+:root[data-theme^="glass"] .btn.alt{color:var(--ac);background:linear-gradient(180deg,rgba(255,255,255,.85),rgba(255,255,255,.35));border:1px solid rgba(255,255,255,.9);box-shadow:inset 0 1.5px 1px #fff,inset 0 -2px 5px rgba(255,255,255,.4),0 6px 14px rgba(20,25,40,.2)}
+:root[data-theme^="glass"] .btn.wa{background:linear-gradient(180deg,rgba(255,255,255,.55) 0%,rgba(255,255,255,.08) 48%,rgba(255,255,255,0) 50%),rgba(31,157,85,.85);box-shadow:inset 0 1.5px 1px rgba(255,255,255,.9),0 8px 18px rgba(31,157,85,.4)}
+:root:is([data-theme="glass20"]){color-scheme:dark;--bg:rgba(255,255,255,.1);--sf:rgba(255,255,255,.1);--ink:#ffffff;--mut:#d3d8f7;--ln:rgba(255,255,255,.2);--ac:#a9c4ff;--ac2:#ffb347;--bad:#ff8a9a;--good:#6fe0a0}
+:root:is([data-theme="glass20"]) header,:root:is([data-theme="glass20"]) nav{background:linear-gradient(135deg,rgba(255,255,255,.2),rgba(255,255,255,.06));border-color:rgba(255,255,255,.25);box-shadow:inset 0 1px 1px rgba(255,255,255,.5),inset 0 0 22px rgba(255,255,255,.06),0 16px 36px rgba(0,0,0,.4)}
+:root:is([data-theme="glass20"]) header select{background:linear-gradient(180deg,rgba(255,255,255,.22),rgba(255,255,255,.08));border-color:rgba(255,255,255,.3);box-shadow:inset 0 1px 1px rgba(255,255,255,.4),0 6px 14px rgba(0,0,0,.35)}
+:root:is([data-theme="glass20"]) nav button.on{color:#fff;background:linear-gradient(180deg,rgba(255,255,255,.34),rgba(255,255,255,.12));box-shadow:inset 0 1px 1px rgba(255,255,255,.55),0 4px 12px rgba(0,0,0,.35)}
+:root:is([data-theme="glass20"]) .card{background:linear-gradient(135deg,rgba(255,255,255,.2) 0%,rgba(255,255,255,.06) 45%,rgba(255,255,255,.05) 66%,rgba(255,255,255,.14) 100%);border-color:rgba(255,255,255,.22);box-shadow:inset 0 1px 1px rgba(255,255,255,.5),inset 0 0 22px rgba(255,255,255,.05),0 22px 46px rgba(0,0,0,.45),0 4px 10px rgba(0,0,0,.25)}
+:root:is([data-theme="glass20"]) .card::before{background:linear-gradient(112deg,rgba(255,255,255,.2) 0%,rgba(255,255,255,.05) 11%,transparent 24%),linear-gradient(112deg,transparent 58%,rgba(255,255,255,.08) 60%,transparent 70%)}
+:root:is([data-theme="glass20"]) .card::after{background:linear-gradient(135deg,rgba(255,255,255,.7) 0%,rgba(255,255,255,.08) 28%,rgba(255,255,255,.03) 55%,rgba(255,255,255,.3) 82%,rgba(255,255,255,.65) 100%);-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask:linear-gradient(#000 0 0) content-box exclude,linear-gradient(#000 0 0)}
+:root:is([data-theme="glass20"]) .big div{background:linear-gradient(150deg,rgba(255,255,255,.16),rgba(255,255,255,.05));border-color:rgba(255,255,255,.2);box-shadow:inset 0 1px 1px rgba(255,255,255,.35),0 6px 14px rgba(0,0,0,.25)}
+:root:is([data-theme="glass20"]) th,:root:is([data-theme="glass20"]) td{border-bottom:1px solid rgba(255,255,255,.14);box-shadow:none}
+:root:is([data-theme="glass20"]) .tot td{border-top:1px solid rgba(255,255,255,.6)}
+:root:is([data-theme="glass20"]) input,:root:is([data-theme="glass20"]) select,:root:is([data-theme="glass20"]) textarea{background:rgba(0,0,0,.25);border-color:rgba(255,255,255,.22);box-shadow:inset 0 3px 7px rgba(0,0,0,.35)}
+:root:is([data-theme="glass20"]) .btn{background:linear-gradient(180deg,rgba(255,255,255,.4) 0%,rgba(255,255,255,.05) 48%,rgba(255,255,255,0) 50%),rgba(70,120,255,.85);border-color:rgba(255,255,255,.4);box-shadow:inset 0 1px 1px rgba(255,255,255,.7),0 8px 20px rgba(60,110,255,.45)}
+:root:is([data-theme="glass20"]) .btn.alt{color:#fff;background:linear-gradient(180deg,rgba(255,255,255,.3),rgba(255,255,255,.12));border-color:rgba(255,255,255,.3);box-shadow:inset 0 1px 1px rgba(255,255,255,.4),0 6px 14px rgba(0,0,0,.3)}
+/* ===== নতুন রিয়েলিস্টিক গ্লাস থিম (১২–১৯) ===== */
+:root[data-theme="glass12"] body{background:linear-gradient(160deg,#e6f4ff,#f3fbff 50%,#e4efff) fixed}
+:root[data-theme="glass12"] body::before{background:radial-gradient(circle 50vmax at 15% 18%,rgba(60,190,255,.55),transparent),radial-gradient(circle 46vmax at 88% 16%,rgba(150,200,255,.55),transparent),radial-gradient(circle 52vmax at 80% 84%,rgba(120,235,240,.5),transparent),radial-gradient(circle 40vmax at 12% 84%,rgba(190,170,255,.4),transparent)}
+:root[data-theme="glass12"]{--ac:#0b78d1;--ac2:#ff9500;--btn:rgba(11,120,209,.85);--btng:rgba(11,120,209,.45)}
+:root:is([data-theme="glass12"]){--grain:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 .9 0'/></filter><rect width='100%' height='100%' filter='url(%23n)' opacity='0.16'/></svg>")}
+:root:is([data-theme="glass20"]){--grain:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 .9 0'/></filter><rect width='100%' height='100%' filter='url(%23n)' opacity='0.14'/></svg>")}
+:root:is([data-theme="glass12"],[data-theme="glass20"]) .card,:root:is([data-theme="glass12"],[data-theme="glass20"]) header,:root:is([data-theme="glass12"],[data-theme="glass20"]) nav{-webkit-backdrop-filter:blur(20px) saturate(190%) brightness(1.06) contrast(1.03);backdrop-filter:blur(20px) saturate(190%) brightness(1.06) contrast(1.03)}
+:root:is([data-theme="glass12"]) .card::before{background:var(--grain),linear-gradient(112deg,rgba(255,255,255,.7) 0%,rgba(255,255,255,.18) 10%,transparent 22%),linear-gradient(112deg,transparent 56%,rgba(255,255,255,.3) 58%,rgba(255,255,255,.07) 65%,transparent 70%),linear-gradient(180deg,rgba(255,255,255,.45) 0%,transparent 12%),radial-gradient(120% 80% at 50% 120%,rgba(255,255,255,.3),transparent 60%)}
+:root:is([data-theme="glass20"]) .card::before{background:var(--grain),linear-gradient(112deg,rgba(255,255,255,.28) 0%,rgba(255,255,255,.06) 10%,transparent 22%),linear-gradient(112deg,transparent 56%,rgba(255,255,255,.1) 58%,rgba(255,255,255,.03) 65%,transparent 70%),linear-gradient(180deg,rgba(255,255,255,.14) 0%,transparent 12%)}
+:root:is([data-theme="glass12"],[data-theme="glass20"]) .btn{background:linear-gradient(180deg,rgba(255,255,255,.5) 0%,rgba(255,255,255,.06) 48%,rgba(255,255,255,0) 50%),var(--btn);box-shadow:inset 0 1.5px 1px rgba(255,255,255,.85),inset 0 -3px 6px rgba(255,255,255,.18),0 8px 18px var(--btng)}
+:root:is([data-theme="glass12"],[data-theme="glass20"]) nav button.on{color:var(--ac)}
+:root:is([data-theme="glass12"]) nav button.on{color:#14213d}
+/* ===== সম্পূর্ণ কালো গ্লাস থিম ===== */
+:root[data-theme="glass20"] body{background:#000 fixed}
+:root[data-theme="glass20"] body::before{background:radial-gradient(120% 55% at 50% -8%,rgba(255,255,255,.07),transparent 60%),radial-gradient(90% 40% at 50% 112%,rgba(255,255,255,.05),transparent 65%)}
+:root[data-theme="glass20"]{--ac:#f2f2f7;--ac2:#ffb347;--btn:rgba(255,255,255,.2);--btng:rgba(255,255,255,.1);--ink:#fff;--mut:#b9b9c4;--bad:#ff7a86;--good:#6fe0a0}
+:root[data-theme="glass20"] .card{border-color:rgba(255,255,255,.16);box-shadow:inset 0 1px 1px rgba(255,255,255,.4),inset 0 -1px 1px rgba(255,255,255,.12),inset 0 0 22px rgba(255,255,255,.04),0 18px 40px rgba(0,0,0,.7),0 0 0 .5px rgba(255,255,255,.08)}
+:root[data-theme="glass20"] .btn{border-color:rgba(255,255,255,.35);color:#fff}
+html.gl-refract:root[data-theme^="glass"] .card,html.gl-refract:root[data-theme^="glass"] header,html.gl-refract:root[data-theme^="glass"] nav{-webkit-backdrop-filter:url(#glassRefract) blur(9px) saturate(175%) brightness(1.06);backdrop-filter:url(#glassRefract) blur(9px) saturate(175%) brightness(1.06)}
+header{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+header select{background:rgba(255,255,255,.2);color:#fff;border:1px solid rgba(255,255,255,.5)}
+header select option{color:#12302b}
+
+/* ===== APP SHELL: Android + iPhone ===== */
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%;-webkit-tap-highlight-color:transparent;overscroll-behavior-y:none}
+body{overscroll-behavior-y:none}
+:root{padding-bottom:0}
+button,nav,.ib,.lr{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;touch-action:manipulation}
+button{transition:transform .12s,opacity .12s}
+button:active{transform:scale(.97);opacity:.8}
+/* status-bar cover so content never shows behind the clock/battery */
+html::before{content:"";position:fixed;top:0;left:0;right:0;height:env(safe-area-inset-top,0px);background:var(--ac);z-index:50;pointer-events:none}
+:root[data-theme^="glass"]::before{background:rgba(255,255,255,.18);-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px)}
+:root:is([data-theme="glass20"])::before{background:rgba(0,0,0,.28)}
+/* top app bar */
+header{position:sticky;top:env(safe-area-inset-top,0px);z-index:30;display:flex;align-items:center;justify-content:space-between;gap:10px}
+header h1{font-size:22px;line-height:1.3}
+header small{font-size:13px}
+:root[data-theme^="glass"] header{top:calc(env(safe-area-inset-top,0px) + 8px);margin:8px 12px 0;padding:12px 18px}
+.p-ios header h1{font-size:26px;font-weight:700;letter-spacing:-.3px}
+.p-android header h1{font-size:21px;font-weight:600}
+/* bottom tab bar */
+nav{position:fixed;left:0;right:0;bottom:0;z-index:40;display:flex;justify-content:space-around;gap:2px;padding:6px 6px calc(6px + env(safe-area-inset-bottom,0px));background:var(--sf);border-top:1px solid var(--ln)}
+nav:empty{display:none}
+nav button{flex:1 1 0;min-width:0;display:flex;flex-direction:column;align-items:center;gap:2px;padding:4px 2px;border:0;border-radius:16px;background:none;color:var(--mut);opacity:1;font:inherit;font-size:11px;font-weight:600;line-height:1.25;cursor:pointer}
+nav button i{display:grid;place-items:center;width:56px;height:30px;border-radius:15px;transition:background .2s}
+nav button svg,.lr svg{width:24px;height:24px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+nav button.on{color:var(--ac)}
+.p-android nav button.on i{background:var(--bg);background:color-mix(in srgb,var(--ac) 20%,transparent)}
+nav button span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+:root[data-theme^="glass"] nav{left:0;right:0;bottom:calc(env(safe-area-inset-bottom,0px) + 8px);margin:0 12px;padding:5px;border-radius:30px}
+:root[data-theme^="glass"] nav button{padding:6px 2px;border-radius:24px;font-weight:600}
+:root[data-theme^="glass"] nav button i{background:none!important}
+:root[data-theme^="glass"] nav button.on{color:var(--ac)}
+@media(min-width:640px){:root[data-theme^="glass"] nav{left:50%;right:auto;width:560px;margin:0;transform:translateX(-50%)}}
+body.hasnav main{padding-bottom:calc(104px + env(safe-area-inset-bottom,0px))}
+/* touch-friendly controls */
+input,select,textarea{font-size:16px;min-height:44px;border-radius:12px;padding:10px 12px}
+textarea{min-height:120px}
+input[type=date],input[type=month]{min-width:0}
+.row>input:not([style]),.row>select:not([style]){flex:1 1 140px}
+.btn{min-height:44px;padding:10px 16px;border-radius:12px}
+.btn:disabled{opacity:.45}
+.x{min-width:44px;min-height:44px;font-size:24px;border-radius:50%}
+th,td{padding:10px 6px}
+.card{border-radius:18px}
+h2{font-size:17px}
+.p-ios .card{border-radius:22px}
+/* day / month stepper */
+.dp{display:flex;gap:8px;align-items:center;margin-bottom:12px}
+.dp input{flex:1;text-align:center}
+.ib{flex:none;width:44px;height:44px;border-radius:50%;border:1px solid var(--ln);background:var(--sf);color:var(--ac);font-size:26px;line-height:1;display:grid;place-items:center;padding:0;cursor:pointer}
+/* meal cards with +/- steppers */
+.mc{background:var(--bg);border-radius:16px;padding:12px;margin-bottom:10px}
+.mc-h{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px}
+.mc-h b{font-size:17px;overflow-wrap:anywhere}
+.mc-b{display:flex;gap:10px}
+.mc .btn{margin-top:10px;width:100%}
+.sg{flex:1;min-width:0}
+.sg>span{display:block;font-size:13px;color:var(--mut);margin-bottom:4px}
+.st{display:flex;align-items:center;justify-content:space-between;gap:4px;background:var(--sf);border:1px solid var(--ln);border-radius:14px;padding:3px}
+.st button{width:44px;height:44px;border:0;border-radius:11px;background:var(--bg);color:var(--ac);font-size:26px;font-weight:600;line-height:1;padding:0;cursor:pointer}
+.st b{flex:1;text-align:center;font-size:22px}
+.big1{display:block;text-align:center;font-size:22px;padding:8px 0}
+.sum{display:flex;gap:8px;margin:2px 0 12px}
+.sum div{flex:1;text-align:center;background:var(--bg);border-radius:14px;padding:8px 4px}
+.sum b{display:block;font-size:20px}.sum span{font-size:13px;color:var(--mut)}
+/* list rows */
+.li{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--ln)}
+.li:last-child{border-bottom:0}
+.li-m{flex:1;min-width:0}
+.li-m b{display:block;font-weight:600;overflow-wrap:anywhere}
+.li-m span{font-size:13px;color:var(--mut)}
+.li-a{font-weight:700;white-space:nowrap}
+.empty{text-align:center;color:var(--mut);padding:18px 0}
+/* per-member bill: tap to expand */
+.pc{background:var(--bg);border-radius:16px;margin-bottom:10px;overflow:hidden}
+.pc summary{list-style:none;display:flex;align-items:center;gap:10px;padding:12px 14px;min-height:56px;cursor:pointer;font-weight:600}
+.pc summary::-webkit-details-marker{display:none}
+.pc summary::after{content:"›";color:var(--mut);font-size:24px;line-height:1;transform:rotate(90deg);transition:transform .2s}
+.pc[open] summary::after{transform:rotate(-90deg)}
+.pc-n{flex:1;min-width:0;overflow-wrap:anywhere}
+.pc-t{font-size:18px;white-space:nowrap}
+.pc-t small{font-size:12px;font-weight:500;margin-right:4px}
+.kv{display:flex;justify-content:space-between;gap:12px;padding:9px 14px;border-top:1px solid var(--ln)}
+.kv span{color:var(--mut)}
+.pc .row{padding:12px 14px;margin:0;border-top:1px solid var(--ln)}
+/* More screen */
+.back{background:none;border:0;color:var(--ac);font:inherit;font-weight:600;min-height:44px;padding:0 4px 0 0;margin-bottom:2px;cursor:pointer}
+:root[data-theme^="glass"] .back{color:var(--ink)}
+.lr{display:flex;align-items:center;gap:12px;width:100%;min-height:56px;padding:6px 0;background:none;border:0;border-bottom:1px solid var(--ln);color:var(--ink);font:inherit;text-align:left;cursor:pointer}
+.lr:last-child{border-bottom:0}
+.lr i{flex:none;width:38px;height:38px;border-radius:12px;display:grid;place-items:center;background:var(--bg);color:var(--ac)}
+.lr i{background:color-mix(in srgb,var(--ac) 18%,transparent)}
+.lr svg{width:20px;height:20px}
+.lr span{flex:1}
+.lr em{color:var(--mut);font-style:normal;font-size:24px}
+.sh{margin:14px 0 8px;font-size:13px;font-weight:600;color:var(--mut)}
+.sh:first-of-type{margin-top:0}
+.sw{display:grid;grid-template-columns:repeat(auto-fill,minmax(74px,1fr));gap:12px 6px}
+.swb{background:none;border:0;padding:0;display:flex;flex-direction:column;align-items:center;gap:6px;color:var(--ink);font:inherit;font-size:12px;cursor:pointer}
+.swb span{width:56px;height:56px;border-radius:18px;border:2px solid rgba(255,255,255,.75);box-shadow:inset 0 2px 2px rgba(255,255,255,.7),0 4px 10px rgba(0,0,0,.22)}
+.swb.on span{outline:3px solid var(--ac);outline-offset:2px}
+.swb.on small{font-weight:700}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+/* Android WebViews: lighter blur so glass stays smooth on mid-range phones */
+html.p-android:root[data-theme^="glass"] .card,html.p-android:root[data-theme^="glass"] header,html.p-android:root[data-theme^="glass"] nav{-webkit-backdrop-filter:blur(12px) saturate(160%);backdrop-filter:blur(12px) saturate(160%)}
+
+/* ===== WEB / DESKTOP: বড় স্ক্রিনে বাম পাশের সাইডবার ===== */
+.pc-only{display:none}
+@media(min-width:900px){
+  body.hasnav{padding-left:264px}
+  body.hasnav main{padding-bottom:32px;max-width:880px}
+  header{max-width:880px;margin-left:auto;margin-right:auto}
+  :root[data-theme^="glass"] header{margin-left:auto;margin-right:auto}
+  html::before{display:none}
+  nav,:root[data-theme^="glass"] nav{left:0;top:0;bottom:0;right:auto;width:264px;transform:none;margin:0;flex-direction:column;justify-content:flex-start;gap:6px;padding:18px 12px;border-radius:0;border-top:0;border-right:1px solid var(--ln)}
+  :root[data-theme^="glass"] nav{left:12px;top:12px;bottom:12px;width:240px;border-radius:28px;border:1px solid rgba(255,255,255,.5)}
+  nav::before{content:"মেস ম্যানেজার";display:block;padding:6px 12px 16px;font-size:19px;font-weight:700;color:var(--ink)}
+  nav button,:root[data-theme^="glass"] nav button{flex:none;flex-direction:row;justify-content:flex-start;gap:12px;height:48px;padding:6px 12px;font-size:15px;border-radius:14px}
+  nav button i,.p-android nav button.on i{width:32px;height:32px;background:none}
+  nav button span{max-width:none}
+  .pc-only{display:block}
+}
+@media(hover:hover){
+  .btn:hover{filter:brightness(1.07)}
+  nav button:hover:not(.on){background:rgba(127,127,127,.14)}
+  .lr:hover,.pc summary:hover{background:rgba(127,127,127,.1)}
+  .swb:hover span{transform:scale(1.06)}
+  .swb span{transition:transform .15s}
+  .st button:hover,.ib:hover{filter:brightness(.95)}
+  button,.btn,.lr,.swb,.pc summary,.ib{cursor:pointer}
+}
+button:focus-visible,summary:focus-visible,a.btn:focus-visible{outline:2px solid var(--ac2);outline-offset:2px}
+.seg{display:flex;gap:4px;padding:4px;background:var(--bg);border-radius:14px;margin-bottom:14px}
+.seg button{flex:1;min-height:42px;border:0;border-radius:11px;background:none;color:var(--mut);font:inherit;font-weight:600}
+.seg button.on{background:var(--sf);color:var(--ac);box-shadow:inset 0 1px 1px rgba(255,255,255,.6),0 2px 8px rgba(0,0,0,.14)}
+.lr:disabled{opacity:.5}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><filter id="glassRefract" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB"><feTurbulence type="fractalNoise" baseFrequency="0.007 0.011" numOctaves="2" seed="7" result="t"/><feGaussianBlur in="t" stdDeviation="3" result="tb"/><feDisplacementMap in="SourceGraphic" in2="tb" scale="24" xChannelSelector="R" yChannelSelector="G" result="dr"/><feColorMatrix in="dr" type="matrix" values="1 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1 0" result="r"/><feDisplacementMap in="SourceGraphic" in2="tb" scale="30" xChannelSelector="R" yChannelSelector="G" result="dg"/><feColorMatrix in="dg" type="matrix" values="0 0 0 0 0  0 1 0 0 0  0 0 0 0 0  0 0 0 1 0" result="g"/><feDisplacementMap in="SourceGraphic" in2="tb" scale="36" xChannelSelector="R" yChannelSelector="G" result="db"/><feColorMatrix in="db" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 1 0 0  0 0 0 1 0" result="b"/><feBlend in="r" in2="g" mode="screen" result="rg"/><feBlend in="rg" in2="b" mode="screen"/></filter></defs></svg>
+<header><div><h1 id="ttl">মেস ম্যানেজার</h1><small>মেস ম্যানেজার</small></div><div id="hr"></div></header>
+<nav id="nav"></nav>
+<main id="app"></main>
+<script>
+const bn=n=>String(n).replace(/\d/g,d=>'০১২৩৪৫৬৭৮৯'[d]);
+const WD=['রবিবার','সোমবার','মঙ্গলবার','বুধবার','বৃহস্পতিবার','শুক্রবার','শনিবার'];
+const dmy=d=>bn(d.slice(8,10)+'/'+d.slice(5,7)+'/'+d.slice(0,4))+' ('+WD[new Date(d+'T00:00:00').getDay()]+')';
+const f2=n=>bn((Math.round(n*100)/100).toFixed(2).replace(/\.00$/,''));
+const ymd=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+const today=()=>ymd(new Date());
+const tomorrow=()=>{const d=new Date();d.setDate(d.getDate()+1);return ymd(d)};
+const dl=d=>d===tomorrow()?'আগামীকালের':d===today()?'আজকের':dmy(d)+' তারিখের';
+const KEY='mess-v1';
+const UA=navigator.userAgent,PF=(window.Capacitor&&Capacitor.getPlatform&&Capacitor.getPlatform())||(/iPhone|iPad|iPod/.test(UA)?'ios':/Android/.test(UA)?'android':'web');
+document.documentElement.classList.add('p-'+PF);
+if(/Chrome\/|Edg\//.test(UA)&&!/Android|Mobile/.test(UA))document.documentElement.classList.add('gl-refract');
+const THEMES={glass12:'#e6f4ff',glass1:'#e6e4ff',glass4:'#ffe0cf',glass20:'#000000'};
+function applyTheme(v){if(!THEMES[v])v='glass1';document.documentElement.setAttribute('data-theme',v);const m=document.querySelector('meta[name=theme-color]');if(m)m.setAttribute('content',THEMES[v])}
+function setTheme(v){if(!THEMES[v])v='glass1';try{localStorage.setItem('theme',v)}catch(e){}applyTheme(v)}
+{let t='';try{t=localStorage.getItem('theme')||''}catch(e){}if(t==='glass')t='glass1';if(!THEMES[t])t='glass1';applyTheme(t)}
+let S;
+try{S=JSON.parse(localStorage.getItem(KEY))}catch(e){}
+S=S||{members:[],days:{},bazar:[],deposits:[],extras:[],open:{},nd:{}};
+S.nd=S.nd||{};S.cooks=S.cooks||[];
+let tab='meal',D=tomorrow(),M=today().slice(0,7);
+const CLOUD=!!(window.FB&&FB.apiKey);
+let prof=null;try{prof=JSON.parse(localStorage.getItem('mprof'))}catch(e){}
+let role=CLOUD?'':'manager',me=(()=>{try{return localStorage.getItem('me')||(prof&&prof.id)||''}catch(e){return ''}})(),authMode='up';
+const pk=p=>String(p||'').replace(/\D/g,'').slice(-10);
+function syncRole(){if(!CLOUD){role='manager';return}
+  let m=me&&S.members.find(x=>x.id===me);
+  if(!m){let ph='';try{ph=localStorage.getItem('mph')||''}catch(e){}const f=ph&&S.members.find(x=>pk(x.phone)===ph);if(f){me=f.id;m=f;try{localStorage.setItem('me',me)}catch(e){}}}
+ // এই ডিভাইসে আগে লগইন করা থাকলে, ক্লাউডের ডাটা আসার আগে/অফলাইনেও লগইন পেজ দেখাবে না
+  if(!m&&!window.cloudReady&&prof&&(!me||prof.id===me)){me=prof.id;m={id:prof.id,name:prof.name,phone:prof.phone};S.members.push(m)}
+  let sr='';try{sr=localStorage.getItem('role')||''}catch(e){}
+  role=m?(S.managerId?(S.managerId===me?'manager':'member'):(sr==='manager'?'manager':'member')):'';
+  if(role&&window.cloudReady){try{localStorage.setItem('role',role)}catch(e){}}}
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}if(CLOUD&&role==='manager'&&(!S.managerId||S.managerId===me)&&window.cloud&&window.cloudReady)window.cloud.push()};
+const uid=()=>Math.random().toString(36).slice(2,8);
+const mem=id=>S.members.find(m=>m.id===id)||{name:'?'};
+const day=d=>S.days[d]||(S.days[d]={menu:{l:'',n:''},meals:{}});
+const ICON={
+meal:'<svg viewBox="0 0 24 24"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/></svg>',
+bazar:'<svg viewBox="0 0 24 24"><path d="m5 11 4-7"/><path d="m19 11-4-7"/><path d="M2 11h20"/><path d="m3.5 11 1.6 7.4a2 2 0 0 0 2 1.6h9.8c.9 0 1.8-.7 2-1.6l1.7-7.4"/><path d="m9 11 1 9"/><path d="m15 11-1 9"/></svg>',
+acc:'<svg viewBox="0 0 24 24"><path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"/><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"/></svg>',
+bill:'<svg viewBox="0 0 24 24"><path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1Z"/><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"/><path d="M12 17.5v-11"/></svg>',
+more:'<svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/></svg>',
+users:'<svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>',
+mgr:'<svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="m16 11 2 2 4-4"/></svg>',
+cook:'<svg viewBox="0 0 24 24"><path d="M6 13.9V20h12v-6.1"/><path d="M17 14a4 4 0 0 0 1-7.9 5 5 0 0 0-9.6-1.4A4.5 4.5 0 0 0 6 14"/><path d="M6 17h12"/></svg>'};
+const tabs=[['meal','মিল',ICON.meal],['bazar','বাজার',ICON.bazar],['acc','জমা-খরচ',ICON.acc],['bill','হিসাব',ICON.bill],['more','আরও',ICON.more]];
+const TTL={mgr:'মিল ম্যানেজার',meal:'মিল ও মেনু',bazar:'বাজার',acc:'জমা ও খরচ',bill:'মাসিক হিসাব',more:'আরও',mem:'সদস্য',cook:'রন্ধন শিল্পির তথ্য'};
+const nav=document.getElementById('nav');
+const go=t=>{tab=t;render();window.scrollTo(0,0)};
+const tabOn=t=>t===tab||(t==='more'&&(tab==='mem'||tab==='cook'||tab==='mgr'));
+function renderNav(){nav.innerHTML=tabs.map(t=>`<button class="${tabOn(t[0])?'on':''}" onclick="go('${t[0]}')" aria-label="${t[1]}"><i>${t[2]}</i><span>${t[1]}</span></button>`).join('')}
+const monthPick=()=>`<div class="row"><label>মাস: <input type="month" value="${M}" onchange="M=this.value;render()"></label></div>`;
+const phone=p=>{p=(p||'').replace(/\D/g,'');if(p.startsWith('0'))p='88'+p;return p};
+const wa=(p,t)=>`https://wa.me/${phone(p)}?text=${encodeURIComponent(t)}`;
+
+/* ---------- calculations ---------- */
+const MN=['জানুয়ারি','ফেব্রুয়ারি','মার্চ','এপ্রিল','মে','জুন','জুলাই','আগস্ট','সেপ্টেম্বর','অক্টোবর','নভেম্বর','ডিসেম্বর'];
+const mn=m=>MN[+m.slice(5)-1]+' '+bn(m.slice(0,4));
+const nxt=m=>{const y=+m.slice(0,4),o=+m.slice(5);return o===12?(y+1)+'-01':y+'-'+String(o+1).padStart(2,'0')};
+function calc(m){
+  const days=Object.entries(S.days).filter(([d])=>d.startsWith(m));
+  const meals={};S.members.forEach(x=>meals[x.id]=0);
+  days.forEach(([,v])=>Object.entries(v.meals).forEach(([id,a])=>{if(id in meals)meals[id]+=(+a[0]||0)+(+a[1]||0)}));
+  const totalMeals=Object.values(meals).reduce((a,b)=>a+b,0);
+  const bazar=S.bazar.filter(b=>b.date.startsWith(m)).reduce((a,b)=>a+b.amt,0);
+  const n=S.members.length||1,rate=totalMeals?bazar/totalMeals:0;
+  const xs=S.extras.filter(e=>e.month===m&&e.k!=='n'),ns=S.extras.filter(e=>e.month===m&&e.k==='n');
+  const sum=a=>a.reduce((t,e)=>t+e.amt,0),xT=sum(xs),nT=sum(ns),nd=S.nd[m]||{};
+  const rows=S.members.map(x=>{
+    const dep=S.deposits.filter(d=>d.mid===x.id&&d.date.startsWith(m)).reduce((a,b)=>a+b.amt,0);
+    const food=meals[x.id]*rate,net=food-dep,xS=xT/n,nS=nT/n,next=+nd[x.id]||0;
+    return {m:x,meals:meals[x.id],food,dep,net,xS,nS,next,total:net+xS+nS+next};
+  });
+  return {totalMeals,bazar,rate,n,xs,ns,xT,nT,rows};
+}
+
+/* ---------- views ---------- */
+const shiftD=n=>{const d=new Date(D+'T00:00:00');d.setDate(d.getDate()+n);D=ymd(d);render()};
+const dpick=()=>`<div class="dp"><button class="ib" onclick="shiftD(-1)" aria-label="আগের দিন">‹</button><input type="date" value="${D}" onchange="D=this.value||D;render()"><button class="ib" onclick="shiftD(1)" aria-label="পরের দিন">›</button></div>`;
+const isLk=(dd,id)=>!!(dd.locked||(dd.lk&&dd.lk[id]));
+function vMeal(){
+  const dd=day(D);let tl=0,tn=0;
+  S.members.forEach(x=>{const a=dd.meals[x.id]||[0,0];tl+=+a[0]||0;tn+=+a[1]||0});
+  const rows=S.members.map(x=>{const a=dd.meals[x.id]||[0,0],l=isLk(dd,x.id);
+    const cell=i=>`<div class="sg"><span>${i?'রাত':'দুপুর'}</span><div class="st"><button type="button" onclick="stp('${x.id}',${i},-1)" aria-label="কমান">−</button><b id="v-${x.id}-${i}">${bn(+a[i]||0)}</b><button type="button" onclick="stp('${x.id}',${i},1)" aria-label="বাড়ান">+</button></div></div>`;
+    return `<div class="mc"><div class="mc-h"><b>${esc(x.name)}</b>${l?'<span class="ok">✓ সেভ হয়েছে</span>':''}</div><div class="mc-b">${cell(0)}${cell(1)}</div>${l?`<button class="btn alt" onclick="unlockMember('${x.id}')">সদস্যের জন্য আবার খুলে দিন</button>`:`<button class="btn" onclick="saveMember('${x.id}')">সেভ করুন</button>`}</div>`}).join('');
+  return `<div class="card"><h2>${dl(D)} মিল</h2>${dpick()}
+  ${S.members.length?`<div class="sum"><div><b>${bn(tl)}</b><span>দুপুর</span></div><div><b>${bn(tn)}</b><span>রাত</span></div><div><b>${bn(tl+tn)}</b><span>মোট</span></div></div>${rows}`:'<p class="note">আগে “আরও → সদস্য” থেকে সদস্য যোগ করুন, বা সদস্যদের সাইন আপ করতে বলুন।</p>'}
+  <p class="note">ম্যানেজার হিসেবে আপনি সেভ হয়ে যাওয়া মিলও + / − দিয়ে বদলাতে পারবেন। সদস্য নিজে বদলাতে চাইলে “আবার খুলে দিন” চাপুন।</p></div>`;
+}
+function unlockMember(id){const dd=day(D);dd.locked=false;dd.lk=dd.lk||{};dd.lk[id]=false;save();render()}
+function stp(id,i,d){const dd=day(D);const a=(dd.meals[id]||[0,0]).slice();a[i]=Math.max(0,(+a[i]||0)+d);dd.meals[id]=a;save();const e=document.getElementById('v-'+id+'-'+i);if(e)e.textContent=bn(a[i])}
+function setMeal(id,i,v){if(isLk(day(D),id))return;const a=day(D).meals[id]||[0,0];a[i]=Math.max(0,+v||0);day(D).meals[id]=a;save()}
+function saveMember(id){if(confirm(mem(id).name+'-এর '+bn(D)+' তারিখের মিল সেভ করবেন? সেভ করার পর আর পরিবর্তন করা যাবে না।')){const dd=day(D);dd.lk=dd.lk||{};dd.lk[id]=true;save();render()}}
+function vMenu(){
+  const dd=day(D);
+  return `<div class="card"><h2>${dl(D)} মেনু</h2>
+  ${dd.menuSaved?`<p>দুপুর: ${esc(dd.menu.l)||'—'}<br>রাত: ${esc(dd.menu.n)||'—'}</p><button class="btn alt" onclick="editMenu()">এডিট করুন</button>`
+  :`<div class="row"><input id="ml" placeholder="দুপুরের মেনু" style="flex:1" value="${esc(dd.menu.l)}"></div><div class="row"><input id="mnn" placeholder="রাতের মেনু" style="flex:1" value="${esc(dd.menu.n)}"></div><button class="btn" onclick="saveMenu()">সেভ করুন</button>`}</div>`;
+}
+function saveMenu(){const dd=day(D);dd.menu.l=bazarV('ml');dd.menu.n=bazarV('mnn');dd.menuSaved=true;save();render()}
+function editMenu(){day(D).menuSaved=false;save();render()}
+function vWam(){
+  const dd=day(D),pend=S.members.filter(x=>!isLk(dd,x.id)).length;
+  return `<div class="card"><h2>হোয়াটস্যাপে পাঠান</h2>
+  ${pend?`<p class="due">${bn(pend)} জনের মিল এখনো সেভ হয়নি। সবার মিল সেভ করুন।</p>`:''}
+  <p class="note">ছবিতে থাকবে: তারিখ, কার কয়টা মিল, মোট মিল ও মেনু। বাটন চাপলে শেয়ার মেনু আসবে, সেখানে হোয়াটসঅ্যাপ বেছে নিন।</p>
+  <div class="row"><button class="btn wa" onclick="sendDay()" ${pend?'disabled':''}>হোয়াটস্যাপে পাঠান</button><button class="btn alt" onclick="dlDay()">ছবি সেভ করুন</button></div>
+  <p class="note pc-only">কম্পিউটারে ছবি কপি হবে। নিচে সদস্যের নামে চাপলে তার চ্যাট খুলবে, সেখানে Ctrl+V চেপে ছবি বসান।</p>
+  <div class="sh">সরাসরি চ্যাট খুলুন</div>
+  <div class="row">${S.members.map(x=>`<a class="btn alt" style="text-decoration:none;display:inline-flex;align-items:center" target="_blank" rel="noopener" href="${wa(x.phone,'')}">${esc(x.name)}</a>`).join('')}</div></div>`;
+}
+async function dayBlob(){
+  const dd=day(D);try{await Promise.all([document.fonts.load('20px "Kalpurush"'),document.fonts.load('700 20px "Kalpurush"')])}catch(e){}
+  let tl=0,tn=0;S.members.forEach(x=>{const a=dd.meals[x.id]||[0,0];tl+=+a[0]||0;tn+=+a[1]||0});
+  const W=640,F='"Kalpurush","Hind Siliguri",sans-serif',cv=document.createElement('canvas');cv.width=W;cv.height=2400;
+  const g=cv.getContext('2d');g.fillStyle='#fff';g.fillRect(0,0,W,2400);g.fillStyle='#0e6b5c';g.fillRect(0,0,W,100);
+  g.fillStyle='#fff';g.font='700 30px '+F;g.textAlign='left';g.fillText(dl(D)+' মিল ও মেনু',28,50);g.font='400 20px '+F;g.fillText('তারিখ: '+dmy(D),28,82);
+  let y=120;const row=(a,b,c,bold,col)=>{g.fillStyle=col||'#12302b';g.font=(bold?'700 ':'400 ')+'21px '+F;g.textAlign='left';g.fillText(a,28,y+22);g.textAlign='right';g.fillText(b,470,y+22);g.fillText(c,W-28,y+22);g.fillStyle='#d5e0dc';g.fillRect(28,y+31,W-56,1);y+=38};
+  row('নাম','দুপুর','রাত',1,'#0e6b5c');
+  S.members.forEach(x=>{const a=dd.meals[x.id]||[0,0];row(x.name,bn(+a[0]||0),bn(+a[1]||0))});
+  row(dl(D)+' মোট মিল',bn(tl),bn(tn),1);
+  g.fillStyle='#12302b';g.font='700 23px '+F;g.textAlign='right';g.fillText('সর্বমোট: '+bn(tl+tn)+' টি মিল',W-28,y+26);y+=50;
+  g.fillStyle='#dcebe7';g.fillRect(0,y,W,38);g.fillStyle='#0e6b5c';g.font='700 22px '+F;g.textAlign='left';g.fillText(dl(D)+' খাবার মেনু',28,y+27);y+=54;
+  const wrap=(t)=>{g.font='400 21px '+F;g.fillStyle='#12302b';let line='';for(const w of t.split(' ')){const tt=line?line+' '+w:w;if(g.measureText(tt).width>W-56&&line){g.fillText(line,28,y);y+=30;line=w}else line=tt}g.fillText(line,28,y);y+=36};
+  wrap('দুপুর: '+(dd.menu.l||'—'));wrap('রাত: '+(dd.menu.n||'—'));
+  const out=document.createElement('canvas');out.width=W;out.height=y+10;const o=out.getContext('2d');o.fillStyle='#fff';o.fillRect(0,0,W,y+10);o.drawImage(cv,0,0);
+  return new Promise(res=>out.toBlob(res,'image/jpeg',.92));
+}
+const blobB64=b=>new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(String(r.result).split(',')[1]);r.onerror=rej;r.readAsDataURL(b)});
+async function nativeShare(b,fname,text){
+  const C=window.Capacitor&&Capacitor.Plugins;
+  if(!(C&&C.Share&&C.Filesystem))return false;
+  try{const w=await C.Filesystem.writeFile({path:fname,data:await blobB64(b),directory:'CACHE'});await C.Share.share({title:text,text,files:[w.uri]});return true}catch(e){return e&&/cancel/i.test(e.message||'')}
+}
+async function shareImg(b,fname,text){
+  if(await nativeShare(b,fname,text))return;
+  const file=new File([b],fname,{type:'image/jpeg'});
+  if(navigator.canShare&&navigator.canShare({files:[file]})){try{await navigator.share({files:[file],text})}catch(e){}return}
+  let ok=false;
+  try{const bm=await createImageBitmap(b),c=document.createElement('canvas');c.width=bm.width;c.height=bm.height;c.getContext('2d').drawImage(bm,0,0);const pb=await new Promise(r=>c.toBlob(r,'image/png'));await navigator.clipboard.write([new ClipboardItem({'image/png':pb})]);ok=true}catch(e){}
+  const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=fname;a.click();
+  alert(ok?'ছবি কপি হয়েছে (ডাউনলোডও হয়েছে)। হোয়াটসঅ্যাপ চ্যাটে Ctrl+V চেপে পাঠান।':'ছবি ডাউনলোড হয়েছে। হোয়াটসঅ্যাপ চ্যাটে ক্লিপ আইকন থেকে যোগ করে পাঠান।');
+}
+async function sendDay(){shareImg(await dayBlob(),'meal-'+D+'.jpg',dl(D)+' মিল ও মেনু — '+dmy(D))}
+async function dlDay(){const b=await dayBlob();if(await nativeShare(b,'meal-'+D+'.jpg',dl(D)+' মিল ও মেনু'))return;const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='meal-'+D+'.jpg';a.click()}
+
+function vBazar(){
+  const list=S.bazar.filter(b=>b.date.startsWith(M)).sort((a,b)=>b.date.localeCompare(a.date));
+  const tot=list.reduce((a,b)=>a+b.amt,0);
+  return monthPick()+`<div class="card"><h2>বাজার যোগ করুন</h2>
+  <div class="row"><input type="date" id="bd" value="${today()}"><input id="bi" placeholder="কী কী কেনা হলো" style="flex:1;min-width:140px"></div>
+  <div class="row"><input id="ba" type="number" inputmode="decimal" min="0" placeholder="টাকা" style="width:100px"><select id="bb" onchange="bazM=this.value" style="flex:1">${S.members.map(x=>`<option value="${x.id}" ${bazM===x.id?'selected':''}>${esc(x.name)}</option>`).join('')}</select></div>
+  <button class="btn" style="width:100%" onclick="addBazar()">যোগ করুন</button></div>
+  <div class="card"><h2>এই মাসের বাজার — ৳${f2(tot)}</h2>
+  ${list.map(b=>li(esc(b.item),bn(b.date.slice(5))+' · '+esc(mem(b.by).name),'৳'+f2(b.amt),'bazar',b.id)).join('')||'<div class="empty">এখনো কোনো বাজার নেই</div>'}</div>`;
+}
+function addBazar(){const a=+bazarV('ba');if(!a)return;S.bazar.push({id:uid(),date:bazarV('bd'),item:bazarV('bi')||'বাজার',amt:a,by:bazarV('bb')});save();render()}
+const bazarV=i=>document.getElementById(i).value;
+const li=(t,sub,amt,k,id)=>`<div class="li"><div class="li-m"><b>${t}</b>${sub?`<span>${sub}</span>`:''}</div>${amt!==''?`<div class="li-a">${amt}</div>`:''}<button class="x" aria-label="মুছুন" onclick="del('${k}','${id}')">×</button></div>`;
+function del(k,id){if(!confirm('মুছে ফেলবেন?'))return;S[k]=S[k].filter(x=>x.id!==id);save();render()}
+
+let exK='x',depM='',bazM='';
+function vAcc(){
+  const dep=S.deposits.filter(d=>d.date.startsWith(M)),ex=S.extras.filter(e=>e.month===M);
+  const lst=k=>ex.filter(e=>(e.k==='n')===(k==='n')).map(e=>li(esc(e.name),'','৳'+f2(e.amt),'extras',e.id)).join('')||'<div class="empty">কিছু নেই</div>';
+  return `<div class="row"><label>বিগত মাস (যে মাসের হিসাব করছেন): <input type="month" value="${M}" onchange="M=this.value;render()"></label></div>
+  <div class="card"><h2>${mn(M)} মাসে খাবার বাবদ জমা</h2>
+  <div class="row"><select id="dm" onchange="depM=this.value" style="flex:1">${S.members.map(x=>`<option value="${x.id}" ${depM===x.id?'selected':''}>${esc(x.name)}</option>`).join('')}</select><input id="da" type="number" inputmode="decimal" min="0" placeholder="টাকা" style="width:100px"></div>
+  <div class="row"><input id="dd" type="date" value="${today()}"><button class="btn" onclick="addDep()">জমা নিন</button></div>
+  ${dep.map(d=>li(esc(mem(d.mid).name),bn(d.date.slice(5)),'৳'+f2(d.amt),'deposits',d.id)).join('')||'<div class="empty">কোনো জমা নেই</div>'}</div>
+  <div class="card"><h2>খরচ যোগ করুন</h2>
+  <div class="row"><select id="ek" onchange="exK=this.value" style="flex:1"><option value="x" ${exK==='x'?'selected':''}>বিগত মাস (${mn(M)}) — আনুষাঙ্গিক খরচ</option><option value="n" ${exK==='n'?'selected':''}>চলতি মাস (${mn(nxt(M))}) — বিল (ভাড়া, গ্যাস, নেট…)</option></select></div>
+  <div class="row"><input id="en" list="el" placeholder="খরচের নাম" style="flex:1;min-width:130px"><datalist id="el"><option>বাসা ভাড়া<option>গ্যাস বিল<option>ইন্টারনেট বিল<option>পানি বিল<option>বুয়া বিল<option>বিদ্যুৎ বিল<option>ময়লা বিল<option>মেরামত<option>অন্যান্য</datalist><input id="ea" type="number" inputmode="decimal" min="0" placeholder="টাকা" style="width:100px"></div>
+  <button class="btn" style="width:100%" onclick="addEx()">যোগ করুন</button>
+  <p class="note">সব খরচ মোট সদস্য সংখ্যা দিয়ে সমান ভাগ হবে।</p>
+  <div class="sh">বিগত মাস (${mn(M)}) — আনুষাঙ্গিক খরচ</div>${lst('x')}
+  <div class="sh">চলতি মাস (${mn(nxt(M))}) — বিল</div>${lst('n')}</div>`;
+}
+function addDep(){const a=+bazarV('da');if(!a)return;S.deposits.push({id:uid(),mid:bazarV('dm'),amt:a,date:bazarV('dd')});save();render()}
+function addEx(){const a=+bazarV('ea');if(!a)return;S.extras.push({id:uid(),name:bazarV('en')||'খরচ',amt:a,month:M,k:bazarV('ek')});save();render()}
+
+const bOpen=new Set();
+const tgB=(id,o)=>{o?bOpen.add(id):bOpen.delete(id)};
+function vBill(){
+  const c=calc(M),A=mn(M),B=mn(nxt(M)),nd=S.nd[M]||{};
+  const kv=(a,b,cl)=>`<div class="kv"><span>${a}</span><b${cl?` class="${cl}"`:''}>${b}</b></div>`;
+  return `<div class="row"><label>বিগত মাস (যে মাসের হিসাব করছেন): <input type="month" value="${M}" onchange="M=this.value;render()"></label></div>
+  <div class="card"><h2>${A} মাসের হিসাব</h2><div class="big">
+  <div><b>${bn(c.totalMeals)}</b><span>মোট মিল</span></div><div><b>৳${f2(c.bazar)}</b><span>মোট বাজার</span></div>
+  <div><b>৳${f2(c.rate)}</b><span>মিল রেট</span></div>
+  <div><b>৳${f2(c.xT/c.n)}</b><span>আনুষাঙ্গিক খরচ, জনপ্রতি (মোট ৳${f2(c.xT)})</span></div>
+  <div><b>৳${f2(c.nT/c.n)}</b><span>${B}-এর বিল, জনপ্রতি (মোট ৳${f2(c.nT)})</span></div></div></div>
+  <div class="card"><h2>${B} মাসের খাবার বাবদ জমা</h2>
+  <div class="row"><input id="nda" type="number" inputmode="decimal" min="0" placeholder="সবার জন্য টাকা" style="flex:1"><button class="btn alt" onclick="allND()">সবাইকে বসান</button></div>
+  ${S.members.map(x=>`<div class="row"><span style="flex:1;min-width:0;overflow-wrap:anywhere">${esc(x.name)}</span><input type="number" inputmode="decimal" min="0" value="${nd[x.id]||''}" onchange="setND('${x.id}',this.value)" style="width:120px"></div>`).join('')}</div>
+  <div class="card"><h2>জনপ্রতি হিসাব</h2><p class="note" style="margin-top:-6px">নামে চাপলে বিস্তারিত ও পাঠানোর বাটন দেখা যাবে।</p>
+  ${c.rows.map(r=>{const neg=r.total<0;return `<details class="pc" ${bOpen.has(r.m.id)?'open':''} ontoggle="tgB('${r.m.id}',this.open)"><summary><span class="pc-n">${esc(r.m.name)}</span><span class="pc-t ${neg?'ok':'due'}">${neg?'<small>ফেরত</small>':''}৳${f2(Math.abs(r.total))}</span></summary>
+  ${kv('মিল',bn(r.meals))}${kv('খাবার খরচ','৳'+f2(r.food))}${kv(A+' জমা','৳'+f2(r.dep))}${kv('ঘাটতি / অবশিষ্ট',(r.net>0?'+':'−')+f2(Math.abs(r.net)),r.net>0?'due':'ok')}${kv('আনুষাঙ্গিক','৳'+f2(r.xS))}${kv(B+' বিল','৳'+f2(r.nS))}${kv(B+' খাবার জমা','৳'+f2(r.next))}${kv(neg?'ফেরত পাবেন':'মোট দিতে হবে','৳'+f2(Math.abs(r.total)),neg?'ok':'due')}
+  <div class="row"><button class="btn wa" onclick="sendBill('${r.m.id}')">হোয়াটসঅ্যাপে পাঠান</button><button class="btn alt" onclick="dlBill('${r.m.id}')">ছবি সেভ করুন</button></div></details>`}).join('')}
+  <p class="note">মোট = (মিল × রেট − জমা) + আনুষাঙ্গিক ভাগ + ${B}-এর বিলের ভাগ + ${B}-এর খাবার জমা। জমার চেয়ে খাবার কম খেলে অবশিষ্ট টাকা সব হিসাবের শেষে বাদ যায়, বেশি খেলে ঘাটতি যোগ হয়।</p></div>`;
+}
+function setND(id,v){S.nd[M]=S.nd[M]||{};S.nd[M][id]=Math.max(0,+v||0);save();render()}
+function allND(){const v=+bazarV('nda')||0;S.nd[M]={};S.members.forEach(x=>S.nd[M][x.id]=v);save();render()}
+function billLines(r,c){
+  const A=mn(M),B=mn(nxt(M)),L=[];
+  L.push({h:`১। ${A} মাসের খাবার হিসাব`});
+  L.push({a:'মিল রেট = মোট বাজার ÷ মোট মিল',b:`${f2(c.bazar)} ÷ ${bn(c.totalMeals)} = ৳${f2(c.rate)}`});
+  L.push({a:'আপনার মিল × মিল রেট',b:`${bn(r.meals)} × ${f2(c.rate)} = ৳${f2(r.food)}`});
+  L.push({a:`${A} মাসে খাবার বাবদ জমা দিয়েছেন`,b:'৳'+f2(r.dep)});
+  L.push(r.net>0?{a:'ঘাটতি (খরচ বেশি, নিচে যোগ হবে)',b:'+ ৳'+f2(r.net)}:{a:'অবশিষ্ট জমা (শেষে বাদ যাবে)',b:'− ৳'+f2(-r.net)});
+  L.push({h:`২। ${A} মাসের আনুষাঙ্গিক খরচ (মোট ÷ ${bn(c.n)} জন)`});
+  c.xs.forEach(e=>L.push({a:`${e.name} (মোট ৳${f2(e.amt)})`,b:'৳'+f2(e.amt/c.n)}));
+  if(!c.xs.length)L.push({a:'কোনো আনুষাঙ্গিক খরচ নেই',b:'৳০'});
+  L.push({a:'আনুষাঙ্গিক খরচের আপনার অংশ',b:'৳'+f2(r.xS),s:1});
+  L.push({h:`৩। ${B} মাসের বিল (মোট ÷ ${bn(c.n)} জন)`});
+  c.ns.forEach(e=>L.push({a:`${e.name} (মোট ৳${f2(e.amt)})`,b:'৳'+f2(e.amt/c.n)}));
+  if(!c.ns.length)L.push({a:'কোনো বিল নেই',b:'৳০'});
+  L.push({a:`${B} মাসের বিলের আপনার অংশ`,b:'৳'+f2(r.nS),s:1});
+  L.push({h:`৪। ${B} মাসের খাবার বাবদ জমা`});
+  L.push({a:'নতুন মাসের জন্য জমা',b:'৳'+f2(r.next),s:1});
+  L.push({h:'৫। সর্বমোট'});
+  if(r.net>0)L.push({a:'১ (ঘাটতি) + ২ + ৩ + ৪',b:`${f2(r.net)} + ${f2(r.xS)} + ${f2(r.nS)} + ${f2(r.next)}`});
+  else{L.push({a:'২ + ৩ + ৪ এর যোগফল',b:'৳'+f2(r.xS+r.nS+r.next)});L.push({a:`${A} মাসের অবশিষ্ট জমা বাদ`,b:'− ৳'+f2(-r.net)})}
+  L.push({a:r.total<0?'আপনি ফেরত পাবেন':`${B} মাসের জন্য মোট দিতে হবে`,b:'৳'+f2(Math.abs(r.total)),t:r.total<0?0:1});
+  return L;
+}
+function mainLines(c){
+  const A=mn(M),B=mn(nxt(M)),L=[];
+  L.push({h:'মেসের মূল খরচ'});
+  L.push({a:'মোট সদস্য',b:bn(c.n)+' জন'});
+  L.push({a:`${A} মাসের মোট মিল`,b:bn(c.totalMeals)});
+  L.push({a:`${A} মাসের মোট বাজার`,b:'৳'+f2(c.bazar)});
+  L.push({a:'মিল রেট',b:'৳'+f2(c.rate),s:1});
+  L.push({h:`${A} মাসের আনুষাঙ্গিক খরচ`});
+  c.xs.forEach(e=>L.push({a:e.name,b:'৳'+f2(e.amt)}));
+  if(!c.xs.length)L.push({a:'কোনো খরচ নেই',b:'৳০'});
+  L.push({a:'মোট',b:'৳'+f2(c.xT),s:1});L.push({a:'জনপ্রতি',b:'৳'+f2(c.xT/c.n),s:1});
+  L.push({h:`${B} মাসের বিল`});
+  c.ns.forEach(e=>L.push({a:e.name,b:'৳'+f2(e.amt)}));
+  if(!c.ns.length)L.push({a:'কোনো বিল নেই',b:'৳০'});
+  L.push({a:'মোট',b:'৳'+f2(c.nT),s:1});L.push({a:'জনপ্রতি',b:'৳'+f2(c.nT/c.n),s:1});
+  return L;
+}
+const lh=L=>L.reduce((t,l)=>t+(l.h?46:36),0);
+async function billBlob(id){
+  const c=calc(M),r=c.rows.find(x=>x.m.id===id),R=billLines(r,c),Lf=mainLines(c);
+  try{await Promise.all([document.fonts.load('20px "Kalpurush"'),document.fonts.load('700 20px "Kalpurush"')])}catch(e){}
+  const W=1180,LW=440,top=180,H=top+Math.max(lh(R),lh(Lf))+30,cv=document.createElement('canvas');cv.width=W;cv.height=H;
+  const g=cv.getContext('2d'),F='"Kalpurush","Hind Siliguri",sans-serif';
+  g.fillStyle='#fff';g.fillRect(0,0,W,H);g.fillStyle='#0e6b5c';g.fillRect(0,0,W,100);
+  g.fillStyle='#fff';g.font='700 30px '+F;g.textAlign='left';g.fillText('মাসিক মেস বিল — '+mn(M),28,50);g.font='400 20px '+F;g.fillText('হিসাবের তারিখ: '+dmy(nxt(M)+'-01'),28,82);
+  g.fillStyle='#f4f8f7';g.fillRect(0,100,LW,H-100);g.fillStyle='#d5e0dc';g.fillRect(LW,100,2,H-100);
+  const draw=(L,x0,x1,y,fs)=>{L.forEach(l=>{
+    if(l.h){g.fillStyle='#dcebe7';g.fillRect(x0-14,y,x1-x0+28,38);g.fillStyle='#0e6b5c';g.font='700 21px '+F;g.textAlign='left';g.fillText(l.h,x0,y+27);y+=46;return}
+    const col=l.t===1?'#b3392f':l.t===0?'#1b7a45':'#12302b';
+    g.fillStyle=col;g.font=((l.s||l.t!==undefined)?'700 ':'400 ')+fs+'px '+F;g.textAlign='left';g.fillText(l.a,x0,y+22);g.textAlign='right';g.fillText(l.b,x1,y+22);
+    g.fillStyle='#d5e0dc';g.fillRect(x0,y+31,x1-x0,1);y+=36})};
+  g.fillStyle='#12302b';g.font='700 28px '+F;g.textAlign='left';g.fillText('সদস্য: '+r.m.name,LW+32,148);
+  draw(Lf,28,LW-28,top-14,19);
+  draw(R,LW+32,W-28,top-14,20);
+  return new Promise(res=>cv.toBlob(res,'image/jpeg',.92));
+}
+async function dlBill(id){const b=await billBlob(id);if(await nativeShare(b,'bill-'+mem(id).name+'-'+M+'.jpg',mn(M)+' মাসের বিল'))return;const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='bill-'+mem(id).name+'-'+M+'.jpg';a.click()}
+async function sendBill(id){
+  const b=await billBlob(id),file=new File([b],'bill.jpg',{type:'image/jpeg'}),m=mem(id);
+  if(await nativeShare(b,'bill-'+m.name+'-'+M+'.jpg',m.name+' — '+mn(M)+' মাসের বিল'))return;
+  if(navigator.canShare&&navigator.canShare({files:[file]})){try{await navigator.share({files:[file],text:m.name+' — '+mn(M)+' মাসের বিল'});return}catch(e){return}}
+  let copied=false;
+  try{const bm=await createImageBitmap(b),c=document.createElement('canvas');c.width=bm.width;c.height=bm.height;c.getContext('2d').drawImage(bm,0,0);const pb=await new Promise(r=>c.toBlob(r,'image/png'));await navigator.clipboard.write([new ClipboardItem({'image/png':pb})]);copied=true}catch(e){}
+  if(!copied)await dlBill(id);
+  window.open(wa(m.phone,''),'_blank');
+  alert(copied?'বিলের ছবি কপি হয়েছে। খোলা হোয়াটসঅ্যাপ চ্যাটে Ctrl+V চেপে ছবি পেস্ট করে পাঠান।':'বিলের ছবি ডাউনলোড হয়েছে। হোয়াটসঅ্যাপ চ্যাটে ক্লিপ আইকন থেকে ছবিটা যোগ করে পাঠান।');
+}
+
+function vMem(){
+  return `<div class="card"><h2>সদস্য যোগ করুন</h2><p class="note" style="margin-top:-6px">সদস্যরা নিজেরাও সাইন আপ করলে এখানে যুক্ত হয়ে যায়। চাইলে আপনি নিজেও যোগ করতে পারেন।</p><div class="row"><input id="mn" placeholder="নাম" style="flex:1;min-width:120px"></div><div class="row"><input id="mp" type="tel" inputmode="tel" placeholder="হোয়াটসঅ্যাপ নম্বর (01XXXXXXXXX)" style="flex:1"></div><button class="btn" style="width:100%" onclick="addMem()">যোগ করুন</button>
+  <div style="margin-top:10px">${S.members.map(x=>`<div class="li"><div class="li-m"><b>${esc(x.name)}${x.id===S.managerId?' <span class="ok" style="font-size:13px">· ম্যানেজার</span>':''}</b>${x.phone?`<span>${esc(x.phone)}</span>`:''}</div><button class="x" aria-label="মুছুন" onclick="delMem('${x.id}')">×</button></div>`).join('')}</div></div>
+  <div class="card"><h2>ব্যাকআপ</h2><p class="note">তথ্য এই ফোনে জমা থাকে। মাঝে মাঝে ব্যাকআপ নিয়ে রাখুন, ফোন বদলালে বা অ্যাপ মুছে ফেললে ফিরিয়ে আনতে পারবেন।</p>
+  <div class="row"><button class="btn alt" onclick="exp()">ব্যাকআপ নামান</button><label class="btn alt" style="display:inline-flex;align-items:center">ব্যাকআপ ফেরত আনুন<input type="file" accept=".json" hidden onchange="imp(this.files[0])"></label></div></div>`;
+}
+function addMem(){const n=bazarV('mn').trim();if(!n)return;const ph=bazarV('mp');if(pk(ph).length>=10&&S.members.some(x=>pk(x.phone)===pk(ph))){alert('এই নম্বরের সদস্য আগে থেকেই আছে');return}S.members.push({id:uid(),name:n,phone:bazarV('mp')});save();render()}
+function delMem(id){if(id===S.managerId){alert('ইনি এখন ম্যানেজার। আগে অন্য কাউকে ম্যানেজার করুন, তারপর মুছুন।');return}if(confirm('এই সদস্য মুছে ফেলবেন?')){S.members=S.members.filter(x=>x.id!==id);save();render()}}
+function exp(){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(S)],{type:'application/json'}));a.download='mess-backup.json';a.click()}
+function imp(f){if(!f)return;f.text().then(t=>{try{S=JSON.parse(t);save();render()}catch(e){alert('ফাইলটি পড়া যায়নি')}})}
+
+let cookForm=false;
+const esc=t=>String(t||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function vCook(){
+  const list=S.cooks.map(c=>`<div class="card"><div class="row"><b style="flex:1;font-size:18px">${esc(c.name)}</b><button class="x" onclick="delCook('${c.id}')">×</button></div>
+  <table><tr><td class="note">মোবাইল নম্বর</td><td>${esc(c.phone)||'—'}</td></tr><tr><td class="note">স্থায়ী ঠিকানা</td><td style="white-space:normal">${esc(c.perm)||'—'}</td></tr><tr><td class="note">বর্তমান ঠিকানা</td><td style="white-space:normal">${esc(c.cur)||'—'}</td></tr></table>
+  ${c.phone?`<div class="row" style="margin-top:8px"><a class="btn alt" style="text-decoration:none" href="tel:${esc(c.phone)}">কল করুন</a></div>`:''}</div>`).join('')||'<div class="card"><p class="note">এখনো কোনো তথ্য নেই। নিচের “তথ্য সংযোজন করুন” বাটনে চাপুন।</p></div>';
+  return `${list}
+  <button class="btn" style="width:100%" onclick="cookForm=!cookForm;render()">তথ্য সংযোজন করুন</button>
+  ${cookForm?`<div class="card" style="margin-top:12px"><h2>নতুন তথ্য</h2>
+  <div class="row"><input id="cn" placeholder="বুয়ার নাম" style="flex:1"></div>
+  <div class="row"><input id="cp" type="tel" placeholder="মোবাইল নম্বর" style="flex:1"></div>
+  <div class="row"><input id="cm" placeholder="স্থায়ী ঠিকানা" style="flex:1"></div>
+  <div class="row"><input id="cc" placeholder="বর্তমান ঠিকানা" style="flex:1"></div>
+  <div class="row"><button class="btn" onclick="addCook()">সেভ করুন</button><button class="btn alt" onclick="cookForm=false;render()">বাতিল</button></div></div>`:''}`;
+}
+function addCook(){const n=bazarV('cn').trim();if(!n){alert('বুয়ার নাম লিখুন');return}S.cooks.push({id:uid(),name:n,phone:bazarV('cp').trim(),perm:bazarV('cm').trim(),cur:bazarV('cc').trim()});cookForm=false;save();render()}
+function delCook(id){if(confirm('এই তথ্য মুছে ফেলবেন?')){S.cooks=S.cooks.filter(c=>c.id!==id);save();render()}}
+
+function vLogin(){
+  const up=authMode==='up';
+  return `<div class="card"><div class="seg"><button class="${up?'on':''}" onclick="authMode='up';render()">সাইন আপ</button><button class="${up?'':'on'}" onclick="authMode='in';render()">লগইন</button></div>
+  <h2>${up?'নতুন সদস্য':'আবার ঢুকুন'}</h2>
+  ${up?'<div class="row"><input id="an" placeholder="আপনার নাম" autocomplete="name" style="flex:1"></div>':''}
+  <div class="row"><input id="ap" type="tel" inputmode="tel" placeholder="মোবাইল নম্বর (01XXXXXXXXX)" autocomplete="tel" style="flex:1"></div>
+  <button class="btn" style="width:100%" onclick="doAuth()">${up?'সাইন আপ করুন':'লগইন করুন'}</button>
+  <p class="note">${up?'সাইন আপ করলে আপনার নাম ও নম্বর নিজে থেকেই মেসের সদস্য তালিকায় যুক্ত হবে। এই নম্বর আগে থেকে তালিকায় থাকলে নতুন করে যুক্ত হবে না, সরাসরি ঢুকে যাবেন।':'ম্যানেজার বা আপনি নিজে যে নম্বর যোগ করেছেন, সেই নম্বর দিয়ে ঢুকুন।'} মিল ম্যানেজার ঠিক করা না থাকলে প্রথম যিনি ঢুকবেন তিনিই ম্যানেজার হবেন, পরে বদলানো যাবে।</p></div>`;
+}
+let authBusy=false;
+async function doAuth(){
+  if(authBusy)return;
+  const up=authMode==='up';let n=up?((document.getElementById('an')||{}).value||'').trim():'';const p=bazarV('ap').trim();
+  if(pk(p).length<10){alert('সঠিক মোবাইল নম্বর দিন');return}
+  if(up&&!n){alert('আপনার নাম লিখুন');return}
+  if(!(window.cloud&&window.cloud.enter)){alert('সংযোগ এখনো তৈরি হয়নি, একটু পরে আবার চেষ্টা করুন');return}
+  authBusy=true;
+  try{
+    const r=await window.cloud.enter(n,p,up?'up':'in');
+    if(r.err){alert(r.err);return}
+    if(!S.members.find(x=>x.id===r.id))S.members.push({id:r.id,name:r.name,phone:r.phone});
+    if(!S.managerId&&r.mgr)S.managerId=r.id;
+    me=r.id;prof={id:r.id,name:r.name,phone:r.phone};try{localStorage.setItem('me',me);localStorage.setItem('mph',pk(r.phone));localStorage.setItem('mprof',JSON.stringify(prof))}catch(e){}
+    if(navigator.storage&&navigator.storage.persist)navigator.storage.persist().catch(()=>{});
+    render();
+  }catch(e){alert('সমস্যা হয়েছে: '+e.message)}finally{authBusy=false}
+}
+function logout(){role='';me='';prof=null;try{localStorage.removeItem('role');localStorage.removeItem('me');localStorage.removeItem('mph');localStorage.removeItem('mprof')}catch(e){}render()}
+function vMy(){
+  const dd=day(D),lk=isLk(dd,me),mine=S.members.find(x=>x.id===me);
+  const a0=dd.meals[me]||[0,0];
+  const cell=i=>`<div class="sg"><span>${i?'রাত':'দুপুর'}</span>${lk?`<b class="big1">${bn(+a0[i]||0)}</b>`:`<div class="st"><button type="button" onclick="stpMe(${i},-1)" aria-label="কমান">−</button><b id="v-me-${i}">${bn(+a0[i]||0)}</b><button type="button" onclick="stpMe(${i},1)" aria-label="বাড়ান">+</button></div>`}</div>`;
+  const others=S.members.filter(x=>x.id!==me).map(x=>{const a=dd.meals[x.id]||[0,0];return `<div class="li"><div class="li-m"><b>${esc(x.name)}</b><span>দুপুর ${bn(+a[0]||0)} · রাত ${bn(+a[1]||0)}</span></div></div>`}).join('');
+  return `<div class="card"><h2>${mine?esc(mine.name)+', আপনার':'আপনার'} মিল</h2>${dpick()}
+  ${lk?'<p class="ok">ম্যানেজার এই দিনের মিল সেভ করে দিয়েছেন, আর বদলানো যাবে না।</p>':'<p class="note">দুপুর ও রাতের মিল + / − দিয়ে ঠিক করুন, নিজে থেকেই সেভ হবে। ম্যানেজার সেভ না করা পর্যন্ত বদলাতে পারবেন।</p>'}
+  <div class="mc"><div class="mc-b">${cell(0)}${cell(1)}</div></div>${mgrName()?`<p class="note">মিল ম্যানেজার: ${mgrName()}। সেভ হয়ে যাওয়া মিল বদলাতে চাইলে তাকে জানান।</p>`:''}</div>
+  <div class="card"><h2>অন্যদের মিল</h2>${others||'<div class="empty">আর কোনো সদস্য নেই</div>'}</div>
+  <div class="card"><h2>মেনু</h2><p>দুপুর: ${esc(dd.menu.l)||'—'}<br>রাত: ${esc(dd.menu.n)||'—'}</p></div>`;
+}
+function stpMe(i,d){if(!me||isLk(day(D),me))return;const a=(day(D).meals[me]||[0,0]).slice();a[i]=Math.max(0,(+a[i]||0)+d);day(D).meals[me]=a;if(window.cloud)window.cloud.meal(D,me,a);const e=document.getElementById('v-me-'+i);if(e)e.textContent=bn(a[i])}
+function myMeal(i,v){if(!me||isLk(day(D),me))return;const a=(day(D).meals[me]||[0,0]).slice();a[i]=Math.max(0,+v||0);day(D).meals[me]=a;if(window.cloud)window.cloud.meal(D,me,a)}
+const SW=[["গ্লাস থিম", [["glass12", "বরফ", "#3cbeff", "#e6f4ff"], ["glass1", "অরোরা", "#80d6ff", "#ff78aa"], ["glass4", "সূর্যাস্ত", "#ff9a5c", "#ff6f91"], ["glass20", "কালো", "#000000", "#4a4a55"]]]];
+const mgrName=()=>{const m=S.members.find(x=>x.id===S.managerId);return m?esc(m.name):''};
+function vMgr(){
+  const cur=S.managerId;
+  return `<div class="card"><h2>মিল ম্যানেজার সিলেক্ট করুন</h2>
+  <p class="note">যাকে ম্যানেজার করবেন, তিনি সব কিছু এডিট করতে পারবেন: সেভ হয়ে যাওয়া মিল বদলানো বা খুলে দেওয়া, বাজার, জমা-খরচ, সদস্য, মেনু ও মাসিক হিসাব। বাকিরা শুধু নিজের মিল দিতে পারবেন। এডিট করা যাবে শুধু ম্যানেজারের ফোনের অ্যাপ থেকে।</p>
+  ${CLOUD?'':'<p class="due">এই সুবিধা ক্লাউড (Firebase) চালু থাকলে কাজ করে, তখন সদস্যরা নিজের ফোনে সাইন আপ করে ঢুকবেন।</p>'}
+  ${S.members.map(x=>`<button class="lr" ${(CLOUD&&role==='manager'&&(!cur||cur===me))?'':'disabled'} onclick="pickMgr('${x.id}')"><i>${ICON.users}</i><span>${esc(x.name)}<small class="note" style="display:block">${esc(x.phone||'নম্বর নেই')}</small></span>${cur===x.id?'<em class="ok" style="font-size:14px;font-weight:700">ম্যানেজার ✓</em>':'<em>›</em>'}</button>`).join('')||'<div class="empty">আগে সদস্য যোগ করুন বা সাইন আপ করান</div>'}</div>`;
+}
+function pickMgr(id){
+  // ম্যানেজার বদলাতে পারবেন শুধু বর্তমান ম্যানেজার
+  if(!CLOUD||role!=='manager'||(S.managerId&&S.managerId!==me)){alert('শুধু বর্তমান ম্যানেজারই ম্যানেজার বদলাতে পারবেন');return}
+  if(id===S.managerId)return;
+  if(!confirm(mem(id).name+'-কে মিল ম্যানেজার করবেন? এরপর শুধু তিনিই সব এডিট করতে পারবেন, আপনি আর পারবেন না।'))return;
+  S.managerId=id;save();render();
+}
+function vMore(){
+  const cur=document.documentElement.getAttribute('data-theme');
+  return `<div class="card"><button class="lr" onclick="go('mgr')"><i>${ICON.mgr}</i><span>মিল ম্যানেজার সিলেক্ট করুন${mgrName()?`<small class="note" style="display:block">বর্তমান: ${mgrName()}</small>`:''}</span><em>›</em></button><button class="lr" onclick="go('mem')"><i>${ICON.users}</i><span>সদস্য ও ব্যাকআপ</span><em>›</em></button><button class="lr" onclick="go('cook')"><i>${ICON.cook}</i><span>রন্ধন শিল্পির তথ্য</span><em>›</em></button></div>
+  <div class="card"><h2>থিম পরিবর্তন করুন</h2>${SW.map(g=>`<div class="sw">${g[1].map(t=>`<button class="swb ${cur===t[0]?'on':''}" onclick="setTheme('${t[0]}');render()" aria-label="${t[1]}"><span style="background:linear-gradient(135deg,${t[2]},${t[3]})"></span><small>${t[1]}</small></button>`).join('')}</div>`).join('')}</div>
+  ${CLOUD&&role?`<div class="card"><button class="btn alt" style="width:100%" onclick="logout()">বের হন</button></div>`:''}`;
+}
+function render(){
+  const known=!!(me&&S.members.find(x=>x.id===me));
+  if(CLOUD&&!window.cloudReady&&!known&&!prof){document.getElementById('app').innerHTML='<div class="card">লোড হচ্ছে…</div>';return}
+  const sm=document.querySelector('header small');if(sm)sm.textContent=(CLOUD&&!window.cloudReady)?'সিঙ্ক হচ্ছে…':'মেস ম্যানেজার';
+  syncRole();
+  const mgr=role==='manager';
+  if(mgr)renderNav();else nav.innerHTML='';
+  document.body.classList.toggle('hasnav',mgr);
+  document.getElementById('ttl').textContent=!role?'স্বাগতম':!mgr?'আমার মিল':TTL[tab];
+  document.getElementById('hr').innerHTML=(CLOUD&&role&&!mgr)?'<button class="btn alt" style="min-height:36px;padding:4px 12px;color:inherit;background:rgba(255,255,255,.2);border-color:rgba(255,255,255,.45)" onclick="logout()">বের হন</button>':'';
+  const back=(tab==='mem'||tab==='cook'||tab==='mgr')?'<button class="back" onclick="go(\'more\')">‹ আরও</button>':'';
+  document.getElementById('app').innerHTML=!role?vLogin():!mgr?vMy():back+{meal:()=>vMeal()+vMenu()+vWam(),bazar:vBazar,acc:vAcc,bill:vBill,more:vMore,mgr:vMgr,mem:vMem,cook:vCook}[tab]();
+}
+if(navigator.storage&&navigator.storage.persist)navigator.storage.persist().catch(()=>{});
+if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
+render();
+</script>
+<script type="module">
+if(window.FB&&FB.apiKey){
+  try{
+    const A=await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js');
+    const F=await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js');
+    const db=F.getFirestore(A.initializeApp(FB)),ref=F.doc(db,'mess','main');
+    let pending=false;
+    window.cloud={
+      push(){F.setDoc(ref,JSON.parse(JSON.stringify(S))).catch(e=>alert('সেভ হয়নি: '+e.message))},
+      meal(d,id,a){F.updateDoc(ref,new F.FieldPath('days',d,'meals',id),a).catch(e=>alert('সেভ হয়নি: '+e.message))},
+      enter(name,phone,mode){
+        return F.runTransaction(db,async tx=>{
+          const snap=await tx.get(ref),d=snap.exists()?snap.data():{},ms=(d.members||[]).slice(),key=pk(phone);
+          let m=ms.find(x=>pk(x.phone)===key);
+          if(!m){
+            if(mode==='in')return {err:'এই নম্বরে কোনো সদস্য নেই। আগে সাইন আপ করুন।'};
+            m={id:uid(),name,phone};ms.push(m);
+          }
+          const mgrId=d.managerId||m.id,upd={members:ms};
+          if(!d.managerId)upd.managerId=mgrId;
+          tx.set(ref,upd,{merge:true});
+          return {id:m.id,name:m.name,phone:m.phone,mgr:mgrId===m.id};
+        });
+      }
+    };
+    F.onSnapshot(ref,snap=>{
+      if(snap.exists())S=Object.assign({members:[],days:{},bazar:[],deposits:[],extras:[],open:{},nd:{},cooks:[]},snap.data());
+      try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}
+      window.cloudReady=true;
+      const el=document.activeElement;
+      if(el&&/INPUT|SELECT|TEXTAREA/.test(el.tagName))pending=true;else render();
+    },e=>alert('ডাটাবেসে সংযোগ হয়নি: '+e.message));
+    document.addEventListener('focusout',()=>{if(pending){pending=false;setTimeout(render,80)}});
+  }catch(e){alert('Firebase চালু হয়নি: '+e.message)}
+}
+</script>
+</body>
+</html>
