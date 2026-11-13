@@ -77,7 +77,10 @@ th{color:var(--mut);font-weight:500;font-size:14px}td.n,th.n{text-align:right}
 @media (min-width:720px){.cmw{display:grid;grid-template-columns:1.1fr 1fr;gap:14px;align-items:start}.cm-card,.cm-ch .card{margin-bottom:14px}.cm-fd{max-height:52vh}}
 .clw{display:block}
 .cl-l{display:flex;flex-direction:column;align-items:flex-start;gap:6px;flex:1;min-width:0}
-.cl-r>.btn{flex-shrink:0;white-space:nowrap}
+.cl-a{display:flex;flex-direction:column;gap:6px;flex-shrink:0;align-items:stretch}
+.cl-a .btn{white-space:nowrap;min-height:38px;padding:4px 12px;font-size:14px}
+.cl-a .btn[disabled]{opacity:.4;cursor:not-allowed}
+.cl-c{display:flex;gap:6px;flex-wrap:wrap}.cl-c i{font-style:normal;font-size:12px;padding:2px 8px;border-radius:10px;background:rgba(127,127,127,.15);color:var(--mut)}.cl-c i.y{color:var(--good);font-weight:600}
 .cl-r>small{flex-basis:100%}
 .cl-r{display:flex;flex-direction:row;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:6px 10px;padding:12px 0;border-top:1px solid rgba(127,127,127,.25)}
 .cl-r:first-of-type{border-top:0}
@@ -381,11 +384,17 @@ const clFind=nm=>{const k=cNm(nm);let f=S.members.find(x=>cNm(x.name)===k);if(f)
 const clRange=(w,m)=>bn(w[0])+'–'+bn(w[1])+' '+MN[+m.slice(5)-1];
 function clSlots(m){
   const t=today(),out=[],pd=n=>String(n).padStart(2,'0');
-  CL_ROOMS.forEach((R,ri)=>R.m.forEach((nm,i)=>{
-    const w=CL_WIN[i],key='r'+(ri+1)+'-'+(i+1),st0=m+'-'+pd(w[0]),en=m+'-'+pd(w[1]);
-    const mb=clFind(nm),rec=(S.cl&&S.cl[m]&&S.cl[m][key])||null;
-    out.push({key,room:R.n,name:nm,mid:mb?mb.id:'',s:st0,e:en,w,rec,st:rec?'done':t>en?'miss':t<st0?'soon':'now'});
-  }));
+  CL_ROOMS.forEach((R,ri)=>{
+    const room=R.m.map(nm=>clFind(nm));
+    R.m.forEach((nm,i)=>{
+      const w=CL_WIN[i],key='r'+(ri+1)+'-'+(i+1),st0=m+'-'+pd(w[0]),en=m+'-'+pd(w[1]);
+      const mb=room[i],r=(S.cl&&S.cl[m]&&S.cl[m][key])||{};
+      /* পুরনো রেকর্ড ({d,by}) ও নতুন ({sd,ap,mg}) দুটোই বোঝা হয় */
+      const sd=r.sd||(r.by==='s'?r.d:''),mg=r.mg||(r.by==='m'?r.d:''),ap=r.ap||null,done=!!(mg||(sd&&ap));
+      const mates=room.filter((x,k)=>k!==i&&x).map(x=>x.id);
+      out.push({key,room:R.n,name:nm,mid:mb?mb.id:'',mates,s:st0,e:en,w,sd,ap,mg,done,st:done?'done':t>en?'miss':t<st0?'soon':'now'});
+    });
+  });
   return out;
 }
 function clFines(m){const o={};clSlots(m).filter(x=>x.st==='miss'&&x.mid).forEach(x=>{(o[x.mid]=o[x.mid]||{amt:0,items:[]});o[x.mid].amt+=CL_FINE;o[x.mid].items.push(x)});return o}
@@ -554,40 +563,46 @@ function cmSend(){
   if(CLOUD&&window.cloud&&window.cloud.cm)window.cloud.cm(id,e,tks);else if(isM())save();else alert('এখনো সার্ভারের সাথে সংযোগ হয়নি, একটু পরে আবার চেষ্টা করুন');
   render()}
 function vClean(){
-  const sl=clSlots(M),mgr=isM(),t=today();
+  const sl=clSlots(M),mgr=isM();
   const fines=sl.filter(x=>x.st==='miss'),fT=fines.length*CL_FINE;
   const row=x=>{
-    const mine=!!me&&x.mid===me,can=mgr||(mine&&x.st==='now'&&!x.rec);
-    const badge=x.st==='done'?`<span class="cl-b ok">✓ পরিষ্কার করেছেন${x.rec.d?' · '+dm(x.rec.d):''}${x.rec.by==='m'?' <small>(ম্যানেজার চিহ্নিত)</small>':''}</span>`
+    const mine=!!me&&x.mid===me,live=x.st==='now',isMate=!!me&&x.mates.includes(me);
+    const apN=x.ap?esc(mem(x.ap.id).name):'';
+    const badge=x.st==='done'?`<span class="cl-b ok">✓ পরিষ্কার সম্পন্ন${x.mg?' <small>(ম্যানেজার চিহ্নিত)</small>':` <small>· সম্মতি: ${apN}</small>`}</span>`
       :x.st==='miss'?`<span class="cl-b due">সময় শেষ · জরিমানা ৳${f2(CL_FINE)}</span>`
-      :x.st==='now'?`<span class="cl-b now">এখন পালা চলছে · শেষ তারিখ ${dm(x.e)}</span>`
+      :x.st==='now'?`<span class="cl-b now">এখন পালা চলছে · শেষ তারিখ ${dm(x.e)}</span><span class="cl-c"><i class="${x.sd?'y':''}">${x.sd?'✓ নিজে জানিয়েছেন':'নিজে জানাননি'}</i><i class="${x.ap?'y':''}">${x.ap?'✓ সম্মতি: '+apN:'সম্মতি বাকি'}</i></span>`
       :`<span class="cl-b soon">আসছে · ${dm(x.s)} থেকে</span>`;
-    const btn=(mine&&x.st==='now'&&!x.rec)?`<button class="btn" onclick="clMark('${x.key}')">পরিষ্কার করেছি</button>`
-      :mgr?`<button class="btn alt cl-m" onclick="clMark('${x.key}')">${x.rec?'চিহ্ন তুলুন':'চিহ্নিত করুন'}</button>`:'';
-    return `<div class="cl-r ${x.st}${mine?' me':''}"><div class="cl-l"><div class="cl-n"><b>${esc(x.name)}</b>${mine?' <em class="nd-me">আপনি</em>':''}<span>${clRange(x.w,M)}</span></div>${badge}</div>${btn}${mgr&&!x.mid?'<small class="due">অ্যাপের সদস্য তালিকায় এই নামে কেউ নেই, তাই জরিমানা যোগ হবে না</small>':''}</div>`};
+    const selfB=(mine&&live&&!x.sd)?`<button class="btn" onclick="clSelf('${x.key}')">পরিষ্কার করেছি</button>`:'';
+    const apOn=live&&isMate&&!x.ap,apTxt=x.ap?'✓ সম্মতি দেওয়া হয়েছে':'সম্মতি দিন';
+    const apB=`<button class="btn alt" ${apOn?'':'disabled'} onclick="clApprove('${x.key}')">${apTxt}</button>`;
+    const mgB=mgr?`<button class="btn alt cl-m" onclick="clMgr('${x.key}')">${x.done||x.sd||x.ap?'চিহ্ন তুলুন':'চিহ্নিত করুন'}</button>`:'';
+    return `<div class="cl-r ${x.st}${mine?' me':''}"><div class="cl-l"><div class="cl-n"><b>${esc(x.name)}</b>${mine?' <em class="nd-me">আপনি</em>':''}<span>${clRange(x.w,M)}</span></div>${badge}</div><div class="cl-a">${selfB}${apB}${mgB}</div>${mgr&&!x.mid?'<small class="due">অ্যাপের সদস্য তালিকায় এই নামে কেউ নেই, তাই জরিমানা বা সম্মতি কাজ করবে না</small>':''}</div>`};
   const rooms=CL_ROOMS.map(R=>`<div class="card"><h2>${R.n}</h2>${sl.filter(x=>x.room===R.n).map(row).join('')}</div>`).join('');
   return monthPick()+`<div class="card"><h2>ওয়াশরুম পরিচ্ছন্নতা — ${mn(M)}</h2>
-  <p class="note" style="margin-top:-6px">প্রত্যেকে নিজের নির্ধারিত তারিখের মধ্যে ওয়াশরুম পরিষ্কার করে “পরিষ্কার করেছি” চাপবেন। সময়ের মধ্যে না চাপলে মাসের হিসাবে স্বয়ংক্রিয়ভাবে ৳${f2(CL_FINE)} জরিমানা যোগ হবে। দুই রুমেই একই সময়সূচি: ১ম জন ${clRange(CL_WIN[0],M)}, ২য় জন ${clRange(CL_WIN[1],M)}, ৩য় জন ${clRange(CL_WIN[2],M)}।</p>
-  ${fines.length?`<div class="sum"><div><b class="due">${bn(fines.length)} জন</b><span>সময়ে করেননি</span></div><div><b class="due">৳${f2(fT)}</b><span>মোট জরিমানা</span></div></div>`:'<p class="note" style="margin:0">এখন পর্যন্ত কারও জরিমানা নেই।</p>'}</div>
+  <p class="note" style="margin-top:-6px">যার পালা, তিনি নির্ধারিত তারিখের মধ্যে ওয়াশরুম পরিষ্কার করে “পরিষ্কার করেছি” চাপবেন। এরপর একই রুমের বাকি দুইজনের যেকোনো একজন নিজের ফোন থেকে “সম্মতি দিন” চেপে নিশ্চিত করবেন যে সত্যিই পরিষ্কার হয়েছে। দুটোই সময়ের মধ্যে না হলে মাসের হিসাবে স্বয়ংক্রিয়ভাবে ৳${f2(CL_FINE)} জরিমানা যোগ হবে। সময়সূচি (দুই রুমেই): ১ম জন ${clRange(CL_WIN[0],M)}, ২য় জন ${clRange(CL_WIN[1],M)}, ৩য় জন ${clRange(CL_WIN[2],M)}। “সম্মতি দিন” বাটন শুধু যার পালা চলছে তার নামের পাশেই চালু থাকে।</p>
+  ${fines.length?`<div class="sum"><div><b class="due">${bn(fines.length)} জন</b><span>সময়ে সম্পন্ন করেননি</span></div><div><b class="due">৳${f2(fT)}</b><span>মোট জরিমানা</span></div></div>`:'<p class="note" style="margin:0">এখন পর্যন্ত কারও জরিমানা নেই।</p>'}</div>
   <div class="clw">${rooms}</div>`;
 }
-function clMark(key){
-  const x=clSlots(M).find(v=>v.key===key);if(!x)return;
-  const mgr=isM(),mine=!!me&&x.mid===me;
+function clSet(x,f,v){
   S.cl=S.cl||{};S.cl[M]=S.cl[M]||{};
-  let rec;
-  if(x.rec){
-    if(!mgr)return;
-    if(!confirm(x.name+'-এর পরিষ্কারের চিহ্ন তুলে নেবেন? সময় পার হয়ে গেলে জরিমানা আবার যোগ হবে।'))return;
-    delete S.cl[M][key];rec=null;
-  }else{
-    if(!(mgr||(mine&&x.st==='now'))){alert('নির্ধারিত তারিখের মধ্যেই শুধু নিজে চিহ্নিত করা যাবে।');return}
-    if(!confirm(mine?'ওয়াশরুম পরিষ্কার করা হয়েছে বলে নিশ্চিত করছেন?':x.name+'-এর পক্ষে “পরিষ্কার হয়েছে” চিহ্নিত করবেন?'))return;
-    rec={d:today(),by:(mine&&x.st==='now')?'s':'m'};S.cl[M][key]=rec;
-  }
+  const r=S.cl[M][x.key]=S.cl[M][x.key]||{};
+  if(f===null)delete S.cl[M][x.key];else if(v===null)delete r[f];else r[f]=v;
   try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}
-  if(CLOUD&&window.cloud&&window.cloud.cl)window.cloud.cl(M,key,rec);else save();
+  if(CLOUD&&window.cloud&&window.cloud.cl)window.cloud.cl(M,x.key,f,v);else save();
   render()}
+const clGet=key=>clSlots(M).find(v=>v.key===key);
+function clSelf(key){
+  const x=clGet(key);if(!x||!me||x.mid!==me||x.st!=='now'||x.sd)return;
+  if(!confirm('ওয়াশরুম পরিষ্কার করা হয়েছে বলে নিশ্চিত করছেন? এরপর রুমমেটের সম্মতিও লাগবে।'))return;
+  clSet(x,'sd',today())}
+function clApprove(key){
+  const x=clGet(key);if(!x||!me||!x.mates.includes(me)||x.st!=='now'||x.ap)return;
+  if(!confirm('নিশ্চিত করছেন যে '+x.name+' ওয়াশরুম পরিষ্কার করেছেন?'))return;
+  clSet(x,'ap',{id:me,d:today()})}
+function clMgr(key){
+  const x=clGet(key);if(!x||!isM())return;
+  if(x.done||x.sd||x.ap){if(!confirm(x.name+'-এর সব চিহ্ন (নিজের জানানো ও সম্মতি) তুলে নেবেন? সময় পার হয়ে গেলে জরিমানা আবার যোগ হবে।'))return;clSet(x,null,null)}
+  else{if(!confirm(x.name+'-এর পক্ষে পুরোপুরি “পরিষ্কার হয়েছে” চিহ্নিত করবেন?'))return;clSet(x,'mg',today())}}
 
 let needTo='',needTo2='';
 const nTos=n=>Array.isArray(n.tos)?n.tos:(n.to?[n.to]:[]);
@@ -998,7 +1013,7 @@ if(window.FB&&FB.apiKey){
     window.cloud={
       push(){F.setDoc(ref,JSON.parse(JSON.stringify(S))).catch(e=>alert('সেভ হয়নি: '+e.message))},
       meal(d,id,a){F.updateDoc(ref,new F.FieldPath('days',d,'meals',id),a).catch(e=>alert('সেভ হয়নি: '+e.message))},
-      cl(m,key,rec){F.updateDoc(ref,new F.FieldPath('cl',m,key),rec===null?F.deleteField():rec).catch(x=>alert('সেভ হয়নি: '+x.message))},
+      cl(m,key,f,v){F.updateDoc(ref,f?new F.FieldPath('cl',m,key,f):new F.FieldPath('cl',m,key),v===null?F.deleteField():v).catch(x=>alert('সেভ হয়নি: '+x.message))},
       cm(id,e,tks){const a=[ref,new F.FieldPath('cm',id),e];tks.forEach(t=>a.push(new F.FieldPath('cmu',t),true));F.updateDoc(...a).catch(x=>alert('সেভ হয়নি: '+x.message))},
       need(id,done,by){F.updateDoc(ref,new F.FieldPath('needs',id,'done'),done,new F.FieldPath('needs',id,'doneBy'),by||'').catch(x=>alert('সেভ হয়নি: '+x.message))},
       bazar(e){F.updateDoc(ref,'bazar',F.arrayUnion(e)).catch(x=>alert('সেভ হয়নি: '+x.message))},
