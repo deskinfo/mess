@@ -320,6 +320,8 @@ const wa=(p,t)=>`https://wa.me/${phone(p)}?text=${encodeURIComponent(t)}`;
 const MN=['জানুয়ারি','ফেব্রুয়ারি','মার্চ','এপ্রিল','মে','জুন','জুলাই','আগস্ট','সেপ্টেম্বর','অক্টোবর','নভেম্বর','ডিসেম্বর'];
 const mn=m=>MN[+m.slice(5)-1]+' '+bn(m.slice(0,4));
 const nxt=m=>{const y=+m.slice(0,4),o=+m.slice(5);return o===12?(y+1)+'-01':y+'-'+String(o+1).padStart(2,'0')};
+const isRent=e=>/ভাড়া/.test(e.name||'');
+const isRifat=x=>/রিফাত|rifat|rifath/i.test(x.name||'');
 function calc(m){
   const days=Object.entries(S.days).filter(([d])=>d.startsWith(m));
   const meals={};S.members.forEach(x=>meals[x.id]=0);
@@ -329,12 +331,16 @@ function calc(m){
   const n=S.members.length||1,rate=totalMeals?bazar/totalMeals:0;
   const xs=S.extras.filter(e=>e.month===m&&e.k!=='n'),ns=S.extras.filter(e=>e.month===m&&e.k==='n');
   const sum=a=>a.reduce((t,e)=>t+e.amt,0),xT=sum(xs),nT=sum(ns),nd=S.nd[m]||{};
+  /* বাসা ভাড়া: রিফাত বাদে বাকি সবার মাঝে সমান ভাগ; অন্য সব খরচ সবার মাঝে সমান ভাগ */
+  const exN=S.members.filter(isRifat).length,rn=S.members.length-exN,rentOn=rn>0&&exN>0;
+  const sh=(e,x)=>(rentOn&&isRent(e))?(isRifat(x)?0:e.amt/rn):e.amt/n;
+  const rentT=a=>sum(a.filter(isRent)),othT=a=>sum(a.filter(e=>!isRent(e)));
   const rows=S.members.map(x=>{
     const dep=S.deposits.filter(d=>d.mid===x.id&&d.date.startsWith(m)).reduce((a,b)=>a+b.amt,0);
-    const food=meals[x.id]*rate,net=food-dep,xS=xT/n,nS=nT/n,next=+nd[x.id]||0;
+    const food=meals[x.id]*rate,net=food-dep,xS=xs.reduce((t,e)=>t+sh(e,x),0),nS=ns.reduce((t,e)=>t+sh(e,x),0),next=+nd[x.id]||0;
     return {m:x,meals:meals[x.id],food,dep,net,xS,nS,next,total:net+xS+nS+next};
   });
-  return {totalMeals,bazar,rate,n,xs,ns,xT,nT,rows};
+  return {totalMeals,bazar,rate,n,xs,ns,xT,nT,rows,sh,rn,rentOn,rentT,othT};
 }
 
 /* ---------- views ---------- */
@@ -373,21 +379,26 @@ function vWam(){
   <div class="sh">সরাসরি চ্যাট খুলুন</div>
   <div class="row">${S.members.map(x=>`<a class="btn alt" style="text-decoration:none;display:inline-flex;align-items:center" target="_blank" rel="noopener" href="${wa(x.phone,'')}">${esc(x.name)}</a>`).join('')}</div></div>`;
 }
+function iceBg(g,W,H){
+  const l=g.createLinearGradient(0,0,W*.34,H);l.addColorStop(0,'#e6f4ff');l.addColorStop(.5,'#f3fbff');l.addColorStop(1,'#e4efff');g.fillStyle=l;g.fillRect(0,0,W,H);
+  const R=Math.max(W,H)*.5,b=(x,y,r,c)=>{const q=g.createRadialGradient(x,y,0,x,y,r);q.addColorStop(0,c);q.addColorStop(1,'rgba(255,255,255,0)');g.fillStyle=q;g.fillRect(0,0,W,H)};
+  b(W*.15,H*.18,R,'rgba(60,190,255,.30)');b(W*.88,H*.16,R*.9,'rgba(150,200,255,.32)');b(W*.8,H*.84,R,'rgba(120,235,240,.28)');b(W*.12,H*.84,R*.8,'rgba(190,170,255,.22)');
+}
 async function dayBlob(){
   const dd=day(D);try{await Promise.all([document.fonts.load('20px "Kalpurush"'),document.fonts.load('700 20px "Kalpurush"')])}catch(e){}
   let tl=0,tn=0;S.members.forEach(x=>{const a=dd.meals[x.id]||[0,0];tl+=+a[0]||0;tn+=+a[1]||0});
   const W=640,F='"Kalpurush","Hind Siliguri",sans-serif',cv=document.createElement('canvas');cv.width=W;cv.height=2400;
-  const g=cv.getContext('2d');g.fillStyle='#fff';g.fillRect(0,0,W,2400);g.fillStyle='#0e6b5c';g.fillRect(0,0,W,100);
-  g.fillStyle='#fff';g.font='700 30px '+F;g.textAlign='left';g.fillText(dl(D)+' মিল ও মেনু',28,50);g.font='400 20px '+F;g.fillText('তারিখ: '+dmy(D),28,82);
-  let y=120;const row=(a,b,c,bold,col)=>{g.fillStyle=col||'#12302b';g.font=(bold?'700 ':'400 ')+'21px '+F;g.textAlign='left';g.fillText(a,28,y+22);g.textAlign='right';g.fillText(b,470,y+22);g.fillText(c,W-28,y+22);g.fillStyle='#d5e0dc';g.fillRect(28,y+31,W-56,1);y+=38};
-  row('নাম','দুপুর','রাত',1,'#0e6b5c');
+  const g=cv.getContext('2d');g.fillStyle='#0b78d1';g.fillRect(0,0,W,100);
+  g.fillStyle='#fff';g.font='700 32px '+F;g.textAlign='left';g.fillText(dl(D)+' মিল ও মেনু',28,50);g.font='400 22px '+F;g.fillText('তারিখ: '+dmy(D),28,82);
+  let y=120;const row=(a,b,c,bold,col)=>{g.fillStyle=col||'#14213d';g.font=(bold?'700 ':'400 ')+'23px '+F;g.textAlign='left';g.fillText(a,28,y+24);g.textAlign='right';g.fillText(b,470,y+24);g.fillText(c,W-28,y+24);g.fillStyle='#b9d6ee';g.fillRect(28,y+33,W-56,1);y+=41};
+  const kv=(a,b,bold)=>{g.fillStyle='#14213d';g.font=(bold?'700 ':'400 ')+(bold?'25px ':'23px ')+F;g.textAlign='left';g.fillText(a,28,y+24);g.textAlign='right';g.fillText(b,W-28,y+24);g.fillStyle='#b9d6ee';g.fillRect(28,y+33,W-56,1);y+=bold?46:41};
+  row('নাম','দুপুর','রাত',1,'#0b78d1');
   S.members.forEach(x=>{const a=dd.meals[x.id]||[0,0];row(x.name,bn(+a[0]||0),bn(+a[1]||0))});
-  row(dl(D)+' মোট মিল',bn(tl),bn(tn),1);
-  g.fillStyle='#12302b';g.font='700 23px '+F;g.textAlign='right';g.fillText('সর্বমোট: '+bn(tl+tn)+' টি মিল',W-28,y+26);y+=50;
-  g.fillStyle='#dcebe7';g.fillRect(0,y,W,38);g.fillStyle='#0e6b5c';g.font='700 22px '+F;g.textAlign='left';g.fillText(dl(D)+' খাবার মেনু',28,y+27);y+=54;
-  const wrap=(t)=>{g.font='400 21px '+F;g.fillStyle='#12302b';let line='';for(const w of t.split(' ')){const tt=line?line+' '+w:w;if(g.measureText(tt).width>W-56&&line){g.fillText(line,28,y);y+=30;line=w}else line=tt}g.fillText(line,28,y);y+=36};
+  y+=8;kv('দুপুরে মোট মিল',bn(tl));kv('রাতে মোট মিল',bn(tn));kv('সর্বমোট মিল',bn(tl+tn),1);y+=10;
+  g.fillStyle='#cfe6f8';g.fillRect(0,y,W,40);g.fillStyle='#0b78d1';g.font='700 24px '+F;g.textAlign='left';g.fillText(dl(D)+' খাবার মেনু',28,y+29);y+=56;
+  const wrap=(t)=>{g.font='400 23px '+F;g.fillStyle='#14213d';let line='';for(const w of t.split(' ')){const tt=line?line+' '+w:w;if(g.measureText(tt).width>W-56&&line){g.fillText(line,28,y);y+=33;line=w}else line=tt}g.fillText(line,28,y);y+=39};
   wrap('দুপুর: '+(dd.menu.l||'—'));wrap('রাত: '+(dd.menu.n||'—'));
-  const out=document.createElement('canvas');out.width=W;out.height=y+10;const o=out.getContext('2d');o.fillStyle='#fff';o.fillRect(0,0,W,y+10);o.drawImage(cv,0,0);
+  const out=document.createElement('canvas');out.width=W;out.height=y+10;const o=out.getContext('2d');iceBg(o,W,y+10);o.drawImage(cv,0,0);
   return new Promise(res=>out.toBlob(res,'image/jpeg',.92));
 }
 const blobB64=b=>new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(String(r.result).split(',')[1]);r.onerror=rej;r.readAsDataURL(b)});
@@ -436,7 +447,7 @@ function vAcc(){
   ${isM()?`<div class="row"><select id="ek" onchange="exK=this.value" style="flex:1"><option value="x" ${exK==='x'?'selected':''}>বিগত মাস (${mn(M)}) — আনুষাঙ্গিক খরচ</option><option value="n" ${exK==='n'?'selected':''}>চলতি মাস (${mn(nxt(M))}) — বিল (ভাড়া, গ্যাস, নেট…)</option></select></div>
   <div class="row"><input id="en" list="el" placeholder="খরচের নাম" style="flex:1;min-width:130px"><datalist id="el"><option>বাসা ভাড়া<option>গ্যাস বিল<option>ইন্টারনেট বিল<option>পানি বিল<option>বুয়া বিল<option>বিদ্যুৎ বিল<option>ময়লা বিল<option>মেরামত<option>অন্যান্য</datalist><input id="ea" type="number" inputmode="decimal" min="0" placeholder="টাকা" style="width:100px"></div>
   <button class="btn" style="width:100%" onclick="addEx()">যোগ করুন</button>
-  <p class="note">সব খরচ মোট সদস্য সংখ্যা দিয়ে সমান ভাগ হবে।</p>`:''}
+  <p class="note">সব খরচ মোট সদস্য সংখ্যা দিয়ে সমান ভাগ হবে। শুধু বাসা ভাড়া (নামে “ভাড়া” থাকলে) রিফাত বাদে বাকি সবার মাঝে সমান ভাগ হবে।</p>`:''}
   <div class="sh">বিগত মাস (${mn(M)}) — আনুষাঙ্গিক খরচ</div>${lst('x')}
   <div class="sh">চলতি মাস (${mn(nxt(M))}) — বিল</div>${lst('n')}</div>`;
 }
@@ -452,8 +463,8 @@ function vBill(){
   <div class="card"><h2>${A} মাসের হিসাব</h2><div class="big">
   <div><b>${bn(c.totalMeals)}</b><span>মোট মিল</span></div><div><b>৳${f2(c.bazar)}</b><span>মোট বাজার</span></div>
   <div><b>৳${f2(c.rate)}</b><span>মিল রেট</span></div>
-  <div><b>৳${f2(c.xT/c.n)}</b><span>আনুষাঙ্গিক খরচ, জনপ্রতি (মোট ৳${f2(c.xT)})</span></div>
-  <div><b>৳${f2(c.nT/c.n)}</b><span>${B}-এর বিল, জনপ্রতি (মোট ৳${f2(c.nT)})</span></div></div></div>
+  <div><b>৳${f2(c.rentOn?c.othT(c.xs)/c.n:c.xT/c.n)}</b><span>আনুষাঙ্গিক খরচ, জনপ্রতি${c.rentOn&&c.rentT(c.xs)?' (ভাড়া বাদে)':''} (মোট ৳${f2(c.xT)})</span></div>
+  <div><b>৳${f2(c.rentOn?c.othT(c.ns)/c.n:c.nT/c.n)}</b><span>${B}-এর বিল, জনপ্রতি${c.rentOn&&c.rentT(c.ns)?' (ভাড়া বাদে)':''} (মোট ৳${f2(c.nT)})</span></div>${c.rentOn&&(c.rentT(c.xs)+c.rentT(c.ns))?`<div><b>৳${f2((c.rentT(c.xs)+c.rentT(c.ns))/c.rn)}</b><span>বাসা ভাড়া, জনপ্রতি (মোট ৳${f2(c.rentT(c.xs)+c.rentT(c.ns))} ÷ ${bn(c.rn)} জন)</span></div>`:''}</div></div>
   <div class="card"><h2>${B} মাসের খাবার বাবদ জমা</h2>
   ${isM()?`<div class="row"><input id="nda" type="number" inputmode="decimal" min="0" placeholder="সবার জন্য টাকা" style="flex:1"><button class="btn alt" onclick="allND()">সবাইকে বসান</button></div>`:''}
   ${S.members.map(x=>`<div class="row"><span style="flex:1;min-width:0;overflow-wrap:anywhere">${esc(x.name)}</span>${isM()?`<input type="number" inputmode="decimal" min="0" value="${nd[x.id]||''}" onchange="setND('${x.id}',this.value)" style="width:120px">`:`<b>৳${f2(+nd[x.id]||0)}</b>`}</div>`).join('')}</div>
@@ -473,11 +484,11 @@ function billLines(r,c){
   L.push({a:`${A} মাসে খাবার বাবদ জমা দিয়েছেন`,b:'৳'+f2(r.dep)});
   L.push(r.net>0?{a:'ঘাটতি (খরচ বেশি, নিচে যোগ হবে)',b:'+ ৳'+f2(r.net)}:{a:'অবশিষ্ট জমা (শেষে বাদ যাবে)',b:'− ৳'+f2(-r.net)});
   L.push({h:`২। ${A} মাসের আনুষাঙ্গিক খরচ (মোট ÷ ${bn(c.n)} জন)`});
-  c.xs.forEach(e=>L.push({a:`${e.name} (মোট ৳${f2(e.amt)})`,b:'৳'+f2(e.amt/c.n)}));
+  c.xs.forEach(e=>L.push({a:`${e.name} (মোট ৳${f2(e.amt)}${c.rentOn&&isRent(e)?' ÷ '+bn(c.rn)+' জন':''})`,b:'৳'+f2(c.sh(e,r.m))}));
   if(!c.xs.length)L.push({a:'কোনো আনুষাঙ্গিক খরচ নেই',b:'৳০'});
   L.push({a:'আনুষাঙ্গিক খরচের আপনার অংশ',b:'৳'+f2(r.xS),s:1});
   L.push({h:`৩। ${B} মাসের বিল (মোট ÷ ${bn(c.n)} জন)`});
-  c.ns.forEach(e=>L.push({a:`${e.name} (মোট ৳${f2(e.amt)})`,b:'৳'+f2(e.amt/c.n)}));
+  c.ns.forEach(e=>L.push({a:`${e.name} (মোট ৳${f2(e.amt)}${c.rentOn&&isRent(e)?' ÷ '+bn(c.rn)+' জন':''})`,b:'৳'+f2(c.sh(e,r.m))}));
   if(!c.ns.length)L.push({a:'কোনো বিল নেই',b:'৳০'});
   L.push({a:`${B} মাসের বিলের আপনার অংশ`,b:'৳'+f2(r.nS),s:1});
   L.push({h:`৪। ${B} মাসের খাবার বাবদ জমা`});
@@ -498,30 +509,30 @@ function mainLines(c){
   L.push({h:`${A} মাসের আনুষাঙ্গিক খরচ`});
   c.xs.forEach(e=>L.push({a:e.name,b:'৳'+f2(e.amt)}));
   if(!c.xs.length)L.push({a:'কোনো খরচ নেই',b:'৳০'});
-  L.push({a:'মোট',b:'৳'+f2(c.xT),s:1});L.push({a:'জনপ্রতি',b:'৳'+f2(c.xT/c.n),s:1});
+  L.push({a:'মোট',b:'৳'+f2(c.xT),s:1});L.push({a:c.rentOn&&c.rentT(c.xs)?'জনপ্রতি (ভাড়া বাদে)':'জনপ্রতি',b:'৳'+f2(c.rentOn?c.othT(c.xs)/c.n:c.xT/c.n),s:1});if(c.rentOn&&c.rentT(c.xs))L.push({a:`ভাড়া জনপ্রতি (${bn(c.rn)} জন)`,b:'৳'+f2(c.rentT(c.xs)/c.rn),s:1});
   L.push({h:`${B} মাসের বিল`});
   c.ns.forEach(e=>L.push({a:e.name,b:'৳'+f2(e.amt)}));
   if(!c.ns.length)L.push({a:'কোনো বিল নেই',b:'৳০'});
-  L.push({a:'মোট',b:'৳'+f2(c.nT),s:1});L.push({a:'জনপ্রতি',b:'৳'+f2(c.nT/c.n),s:1});
+  L.push({a:'মোট',b:'৳'+f2(c.nT),s:1});L.push({a:c.rentOn&&c.rentT(c.ns)?'জনপ্রতি (ভাড়া বাদে)':'জনপ্রতি',b:'৳'+f2(c.rentOn?c.othT(c.ns)/c.n:c.nT/c.n),s:1});if(c.rentOn&&c.rentT(c.ns))L.push({a:`ভাড়া জনপ্রতি (${bn(c.rn)} জন)`,b:'৳'+f2(c.rentT(c.ns)/c.rn),s:1});
   return L;
 }
-const lh=L=>L.reduce((t,l)=>t+(l.h?46:36),0);
+const lh=L=>L.reduce((t,l)=>t+(l.h?48:39),0);
 async function billBlob(id){
   const c=calc(M),r=c.rows.find(x=>x.m.id===id),R=billLines(r,c),Lf=mainLines(c);
   try{await Promise.all([document.fonts.load('20px "Kalpurush"'),document.fonts.load('700 20px "Kalpurush"')])}catch(e){}
-  const W=1180,LW=440,top=180,H=top+Math.max(lh(R),lh(Lf))+30,cv=document.createElement('canvas');cv.width=W;cv.height=H;
+  const W=1260,LW=480,top=180,H=top+Math.max(lh(R),lh(Lf))+30,cv=document.createElement('canvas');cv.width=W;cv.height=H;
   const g=cv.getContext('2d'),F='"Kalpurush","Hind Siliguri",sans-serif';
-  g.fillStyle='#fff';g.fillRect(0,0,W,H);g.fillStyle='#0e6b5c';g.fillRect(0,0,W,100);
-  g.fillStyle='#fff';g.font='700 30px '+F;g.textAlign='left';g.fillText('মাসিক মেস বিল — '+mn(M),28,50);g.font='400 20px '+F;g.fillText('হিসাবের তারিখ: '+dmy(nxt(M)+'-01'),28,82);
-  g.fillStyle='#f4f8f7';g.fillRect(0,100,LW,H-100);g.fillStyle='#d5e0dc';g.fillRect(LW,100,2,H-100);
+  iceBg(g,W,H);g.fillStyle='#0b78d1';g.fillRect(0,0,W,100);
+  g.fillStyle='#fff';g.font='700 32px '+F;g.textAlign='left';g.fillText('মাসিক মেস বিল — '+mn(M),28,50);g.font='400 22px '+F;g.fillText('হিসাবের তারিখ: '+dmy(nxt(M)+'-01'),28,82);
+  g.fillStyle='#b9d6ee';g.fillRect(LW,100,2,H-100);
   const draw=(L,x0,x1,y,fs)=>{L.forEach(l=>{
-    if(l.h){g.fillStyle='#dcebe7';g.fillRect(x0-14,y,x1-x0+28,38);g.fillStyle='#0e6b5c';g.font='700 21px '+F;g.textAlign='left';g.fillText(l.h,x0,y+27);y+=46;return}
-    const col=l.t===1?'#b3392f':l.t===0?'#1b7a45':'#12302b';
-    g.fillStyle=col;g.font=((l.s||l.t!==undefined)?'700 ':'400 ')+fs+'px '+F;g.textAlign='left';g.fillText(l.a,x0,y+22);g.textAlign='right';g.fillText(l.b,x1,y+22);
-    g.fillStyle='#d5e0dc';g.fillRect(x0,y+31,x1-x0,1);y+=36})};
-  g.fillStyle='#12302b';g.font='700 28px '+F;g.textAlign='left';g.fillText('সদস্য: '+r.m.name,LW+32,148);
-  draw(Lf,28,LW-28,top-14,19);
-  draw(R,LW+32,W-28,top-14,20);
+    if(l.h){g.fillStyle='#cfe6f8';g.fillRect(x0-14,y,x1-x0+28,40);g.fillStyle='#0b78d1';g.font='700 23px '+F;g.textAlign='left';g.fillText(l.h,x0,y+29);y+=48;return}
+    const col=l.t===1?'#b3392f':l.t===0?'#1b7a45':'#14213d';
+    g.fillStyle=col;g.font=((l.s||l.t!==undefined)?'700 ':'400 ')+fs+'px '+F;g.textAlign='left';g.fillText(l.a,x0,y+24);g.textAlign='right';g.fillText(l.b,x1,y+24);
+    g.fillStyle='#b9d6ee';g.fillRect(x0,y+33,x1-x0,1);y+=39})};
+  g.fillStyle='#14213d';g.font='700 30px '+F;g.textAlign='left';g.fillText('সদস্য: '+r.m.name,LW+32,148);
+  draw(Lf,28,LW-28,top-14,21);
+  draw(R,LW+32,W-28,top-14,22);
   return new Promise(res=>cv.toBlob(res,'image/jpeg',.92));
 }
 async function dlBill(id){const b=await billBlob(id);if(await nativeShare(b,'bill-'+mem(id).name+'-'+M+'.jpg',mn(M)+' মাসের বিল'))return;const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='bill-'+mem(id).name+'-'+M+'.jpg';a.click()}
