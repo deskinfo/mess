@@ -379,8 +379,17 @@ const isRifat=x=>/রিফাত|rifat|rifath/i.test(x.name||'');
 /* ---------- পরিচ্ছন্নতা ---------- */
 const CL_ROOMS=[{n:'রুম - ১',m:['আল আমিন','মমরেজ','সৈকত']},{n:'রুম - ২',m:['ইমদাদ','পলাশ','পিয়াস']}];
 const CL_WIN=[[1,3],[10,13],[20,23]],CL_FINE=200;
-const cNm=x=>String(x||'').replace(/[\s\u200b-\u200d]/g,'').toLowerCase();
-const clFind=nm=>{const k=cNm(nm);let f=S.members.find(x=>cNm(x.name)===k);if(f)return f;const c=S.members.filter(x=>{const y=cNm(x.name);return y&&(y.includes(k)||k.includes(y))});return c.length===1?c[0]:null};
+const cNm=x=>String(x||'').normalize('NFC').replace(/[\s\u200b-\u200d.\-_]/g,'').toLowerCase();
+/* বানান/কিবোর্ডের ছোটখাটো ভিন্নতা (য়/য, শ/স, ী/ি ইত্যাদি) এক ধরে নেওয়া */
+const cLoose=x=>cNm(x).replace(/\u09bc/g,'').replace(/[শষ]/g,'স').replace(/[ীঈ]/g,'ি').replace(/[ূঊ]/g,'ু').replace(/ণ/g,'ন').replace(/ৎ/g,'ত');
+const clFind=nm=>{
+  for(const f of [cNm,cLoose]){
+    const k=f(nm);if(!k)continue;
+    let r=S.members.find(x=>f(x.name)===k);if(r)return r;
+    const c=S.members.filter(x=>{const y=f(x.name);return y&&(y.includes(k)||k.includes(y))});
+    if(c.length===1)return c[0];
+  }
+  return null};
 const clRange=(w,m)=>bn(w[0])+'–'+bn(w[1])+' '+MN[+m.slice(5)-1];
 function clSlots(m){
   const t=today(),out=[],pd=n=>String(n).padStart(2,'0');
