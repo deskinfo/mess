@@ -45,6 +45,52 @@ th,td{padding:7px 6px;border-bottom:1px solid var(--ln);text-align:left;white-sp
 th{color:var(--mut);font-weight:500;font-size:14px}td.n,th.n{text-align:right}
 .mi{width:58px;text-align:center}
 .big{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px}
+.big .bt{grid-column:1/-1}.big .bt p{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin:0;padding:6px 0}.big .bt p+p{border-top:1px dashed rgba(127,127,127,.35)}.big .bt p span{font-size:14px;color:var(--mut)}.big .bt p b{display:inline;font-size:20px}.big .bt .bt-r{border-top:1px solid rgba(127,127,127,.45)!important}
+.nd-l{flex:1;min-width:140px;display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--mut)}
+.nd-i{display:flex;align-items:center;gap:10px;padding:10px 0;border-top:1px solid rgba(127,127,127,.25)}
+.nd-i:first-of-type{border-top:0}
+.nd-i .li-m{flex:1;min-width:0}.nd-i .li-m b{overflow-wrap:anywhere}.nd-i .li-m small{font-weight:400;color:var(--mut)}
+.nd-i .li-m span{display:block;font-size:13px;color:var(--mut)}
+.nd-i.dn .li-m b{text-decoration:line-through;opacity:.55}
+.nd-a{display:flex;align-items:center;gap:6px;flex-shrink:0}
+.nd-b{min-height:36px;padding:4px 12px;font-size:14px}
+.nd-me{font-style:normal;font-size:12px;padding:1px 8px;border-radius:10px;background:rgba(127,127,127,.2);color:var(--tx,inherit)}
+.cmw{display:block}
+.cm-fd{display:flex;flex-direction:column;gap:8px;max-height:46vh;overflow-y:auto;padding:2px 2px 6px;margin-top:4px}
+.cm-m{padding:10px 12px;border-radius:14px;background:rgba(127,127,127,.12);border:1px solid rgba(127,127,127,.18)}
+.cm-m p{margin:0;overflow-wrap:anywhere}
+.cm-f{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:6px;flex-wrap:wrap}.cm-f small{color:var(--mut);margin-left:auto}
+.cm-tg{font-size:12px;font-weight:600;padding:2px 9px;border-radius:10px;background:rgba(127,127,127,.18)}.cm-tg.bad{color:var(--bad)}.cm-tg.good{color:var(--good)}
+.cm-cp{margin-top:10px;padding-top:10px;border-top:1px solid rgba(127,127,127,.3)}
+.cm-k{display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap}
+.cm-kb{flex:1;min-height:36px;padding:4px 10px;border-radius:18px;border:1px solid var(--ln);background:rgba(127,127,127,.1);color:inherit;font:inherit;font-size:14px}
+.cm-kb.on{background:var(--ac);color:#fff;border-color:var(--ac)}
+.cm-b{display:flex;gap:8px;align-items:stretch}.cm-b textarea{flex:1;min-height:56px;resize:none}
+.cm-s{width:52px;min-width:52px;padding:0;display:flex;align-items:center;justify-content:center}
+.cmc{display:flex;align-items:flex-end;gap:10px;overflow-x:auto;padding:6px 2px 2px}
+.cmc-c{flex:1 0 56px;max-width:110px;display:flex;flex-direction:column;align-items:center;gap:4px;text-align:center}
+.cmc-c em{font-style:normal;font-weight:700;font-size:15px}
+.cmc-t{width:100%;height:110px;display:flex;align-items:flex-end;justify-content:center}
+.cmc-t i{display:block;width:70%;max-width:44px;border-radius:8px 8px 3px 3px;background:var(--bad);transition:height .3s}
+.cmc.good .cmc-t i{background:var(--good)}
+.cmc-c span{font-size:13px;color:var(--mut);overflow-wrap:anywhere;line-height:1.3}
+@media (min-width:720px){.cmw{display:grid;grid-template-columns:1.1fr 1fr;gap:14px;align-items:start}.cm-card,.cm-ch .card{margin-bottom:14px}.cm-fd{max-height:52vh}}
+.clw{display:block}
+.cl-l{display:flex;flex-direction:column;align-items:flex-start;gap:6px;flex:1;min-width:0}
+.cl-r>.btn{flex-shrink:0;white-space:nowrap}
+.cl-r>small{flex-basis:100%}
+.cl-r{display:flex;flex-direction:row;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:6px 10px;padding:12px 0;border-top:1px solid rgba(127,127,127,.25)}
+.cl-r:first-of-type{border-top:0}
+.cl-n{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 8px}.cl-n b{font-size:17px}.cl-n span{color:var(--mut);font-size:14px;flex-basis:100%}
+.cl-b{font-size:14px;font-weight:600;padding:3px 10px;border-radius:12px;background:rgba(127,127,127,.15)}
+.cl-b.ok{color:var(--good)}.cl-b.due{color:var(--bad)}.cl-b.now{color:var(--ac)}.cl-b.soon{color:var(--mut);font-weight:500}.cl-b small{font-weight:400}
+.cl-r.me{background:rgba(127,127,127,.08);margin:0 -8px;padding-left:8px;padding-right:8px;border-radius:12px}
+.cl-m{min-height:36px;padding:4px 12px;font-size:14px}
+@media (min-width:720px){.clw{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:start}}
+.big.lay{grid-template-columns:1.15fr 1fr 1fr;align-items:stretch}
+.big.lay .bt{grid-column:1;grid-row:1/3;display:flex;flex-direction:column;justify-content:center}
+.big.lay .bw{grid-column:1/-1}
+@media (max-width:560px){.big.lay{grid-template-columns:1fr 1fr}.big.lay .bt{grid-column:1/-1;grid-row:auto}.big.lay div:not(.bt) b{font-size:19px}}
 .big div{background:var(--bg);border-radius:8px;padding:10px}.big b{display:block;font-size:22px}.big span{color:var(--mut);font-size:14px}
 .due{color:var(--bad);font-weight:700}.ok{color:var(--good);font-weight:700}
 .note{color:var(--mut);font-size:14px}
@@ -249,6 +295,7 @@ button:focus-visible,summary:focus-visible,a.btn:focus-visible{outline:2px solid
 .seg button{flex:1;min-height:42px;border:0;border-radius:11px;background:none;color:var(--mut);font:inherit;font-weight:600}
 .seg button.on{background:var(--sf);color:var(--ac);box-shadow:inset 0 1px 1px rgba(255,255,255,.6),0 2px 8px rgba(0,0,0,.14)}
 .lr:disabled{opacity:.5}
+@media (max-width:480px){nav button{font-size:10px!important}nav button i{width:42px!important}}
 </style>
 </head>
 <body>
@@ -280,7 +327,7 @@ function setTheme(v){if(!THEMES[v])v='glass1';try{localStorage.setItem('theme',v
 let S;
 try{S=JSON.parse(localStorage.getItem(KEY))}catch(e){}
 S=S||{members:[],days:{},bazar:[],deposits:[],extras:[],open:{},nd:{}};
-S.nd=S.nd||{};S.cooks=S.cooks||[];
+S.nd=S.nd||{};S.needs=S.needs||{};S.cm=S.cm||{};S.cmu=S.cmu||{};S.cl=S.cl||{};S.cooks=S.cooks||[];
 let tab='meal',D=tomorrow(),M=today().slice(0,7);
 const CLOUD=!!(window.FB&&FB.apiKey);
 let prof=null;try{prof=JSON.parse(localStorage.getItem('mprof'))}catch(e){}
@@ -304,12 +351,14 @@ meal:'<svg viewBox="0 0 24 24"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/
 bazar:'<svg viewBox="0 0 24 24"><path d="m5 11 4-7"/><path d="m19 11-4-7"/><path d="M2 11h20"/><path d="m3.5 11 1.6 7.4a2 2 0 0 0 2 1.6h9.8c.9 0 1.8-.7 2-1.6l1.7-7.4"/><path d="m9 11 1 9"/><path d="m15 11-1 9"/></svg>',
 acc:'<svg viewBox="0 0 24 24"><path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"/><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"/></svg>',
 bill:'<svg viewBox="0 0 24 24"><path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1Z"/><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"/><path d="M12 17.5v-11"/></svg>',
+cl:'<svg viewBox="0 0 24 24"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/></svg>',
+cm:'<svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><path d="M8 9h8"/><path d="M8 13h5"/></svg>',
 more:'<svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/></svg>',
 users:'<svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>',
 mgr:'<svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="m16 11 2 2 4-4"/></svg>',
 cook:'<svg viewBox="0 0 24 24"><path d="M6 13.9V20h12v-6.1"/><path d="M17 14a4 4 0 0 0 1-7.9 5 5 0 0 0-9.6-1.4A4.5 4.5 0 0 0 6 14"/><path d="M6 17h12"/></svg>'};
-const tabs=[['meal','মিল',ICON.meal],['bazar','বাজার',ICON.bazar],['acc','জমা-খরচ',ICON.acc],['bill','হিসাব',ICON.bill],['more','আরও',ICON.more]];
-const TTL={mgr:'মিল ম্যানেজার',meal:'মিল ও মেনু',bazar:'বাজার',acc:'জমা ও খরচ',bill:'মাসিক হিসাব',more:'আরও',mem:'সদস্য',cook:'রন্ধন শিল্পির তথ্য'};
+const tabs=[['meal','মিল',ICON.meal],['bazar','বাজার',ICON.bazar],['acc','জমা-খরচ',ICON.acc],['bill','হিসাব',ICON.bill],['cm','মন্তব্য',ICON.cm],['cl','পরিচ্ছন্নতা',ICON.cl],['more','আরও',ICON.more]];
+const TTL={mgr:'মিল ম্যানেজার',meal:'মিল ও মেনু',bazar:'বাজার',acc:'জমা ও খরচ',bill:'মাসিক হিসাব',cm:'মন্তব্য',cl:'পরিচ্ছন্নতা',more:'আরও',mem:'সদস্য',cook:'রন্ধন শিল্পির তথ্য'};
 const nav=document.getElementById('nav');
 const go=t=>{tab=t;render();window.scrollTo(0,0)};
 const tabOn=t=>t===tab||(t==='more'&&(tab==='mem'||tab==='cook'||tab==='mgr'));
@@ -324,12 +373,29 @@ const mn=m=>MN[+m.slice(5)-1]+' '+bn(m.slice(0,4));
 const nxt=m=>{const y=+m.slice(0,4),o=+m.slice(5);return o===12?(y+1)+'-01':y+'-'+String(o+1).padStart(2,'0')};
 const isRent=e=>/ভাড়া/.test(e.name||'');
 const isRifat=x=>/রিফাত|rifat|rifath/i.test(x.name||'');
+/* ---------- পরিচ্ছন্নতা ---------- */
+const CL_ROOMS=[{n:'রুম - ১',m:['আল আমিন','মমরেজ','সৈকত']},{n:'রুম - ২',m:['ইমদাদ','পলাশ','পিয়াস']}];
+const CL_WIN=[[1,3],[10,13],[20,23]],CL_FINE=200;
+const cNm=x=>String(x||'').replace(/[\s\u200b-\u200d]/g,'').toLowerCase();
+const clFind=nm=>{const k=cNm(nm);let f=S.members.find(x=>cNm(x.name)===k);if(f)return f;const c=S.members.filter(x=>{const y=cNm(x.name);return y&&(y.includes(k)||k.includes(y))});return c.length===1?c[0]:null};
+const clRange=(w,m)=>bn(w[0])+'–'+bn(w[1])+' '+MN[+m.slice(5)-1];
+function clSlots(m){
+  const t=today(),out=[],pd=n=>String(n).padStart(2,'0');
+  CL_ROOMS.forEach((R,ri)=>R.m.forEach((nm,i)=>{
+    const w=CL_WIN[i],key='r'+(ri+1)+'-'+(i+1),st0=m+'-'+pd(w[0]),en=m+'-'+pd(w[1]);
+    const mb=clFind(nm),rec=(S.cl&&S.cl[m]&&S.cl[m][key])||null;
+    out.push({key,room:R.n,name:nm,mid:mb?mb.id:'',s:st0,e:en,w,rec,st:rec?'done':t>en?'miss':t<st0?'soon':'now'});
+  }));
+  return out;
+}
+function clFines(m){const o={};clSlots(m).filter(x=>x.st==='miss'&&x.mid).forEach(x=>{(o[x.mid]=o[x.mid]||{amt:0,items:[]});o[x.mid].amt+=CL_FINE;o[x.mid].items.push(x)});return o}
 function calc(m){
   const days=Object.entries(S.days).filter(([d])=>d.startsWith(m));
   const meals={};S.members.forEach(x=>meals[x.id]=0);
   days.forEach(([,v])=>Object.entries(v.meals).forEach(([id,a])=>{if(id in meals)meals[id]+=(+a[0]||0)+(+a[1]||0)}));
   const totalMeals=Object.values(meals).reduce((a,b)=>a+b,0);
   const bazar=S.bazar.filter(b=>b.date.startsWith(m)).reduce((a,b)=>a+b.amt,0);
+  const totalDep=S.deposits.filter(d=>d.date.startsWith(m)).reduce((a,b)=>a+b.amt,0),remain=totalDep-bazar;
   const n=S.members.length||1,rate=totalMeals?bazar/totalMeals:0;
   const xs=S.extras.filter(e=>e.month===m&&e.k!=='n'),ns=S.extras.filter(e=>e.month===m&&e.k==='n');
   const sum=a=>a.reduce((t,e)=>t+e.amt,0),xT=sum(xs),nT=sum(ns),nd=S.nd[m]||{};
@@ -337,12 +403,14 @@ function calc(m){
   const exN=S.members.filter(isRifat).length,rn=S.members.length-exN,rentOn=rn>0&&exN>0;
   const sh=(e,x)=>(rentOn&&isRent(e))?(isRifat(x)?0:e.amt/rn):e.amt/n;
   const rentT=a=>sum(a.filter(isRent)),othT=a=>sum(a.filter(e=>!isRent(e)));
+  const clf=clFines(m);
   const rows=S.members.map(x=>{
     const dep=S.deposits.filter(d=>d.mid===x.id&&d.date.startsWith(m)).reduce((a,b)=>a+b.amt,0);
     const food=meals[x.id]*rate,net=food-dep,xS=xs.reduce((t,e)=>t+sh(e,x),0),nS=ns.reduce((t,e)=>t+sh(e,x),0),next=+nd[x.id]||0;
-    return {m:x,meals:meals[x.id],food,dep,net,xS,nS,next,total:net+xS+nS+next};
+    const fine=clf[x.id]?clf[x.id].amt:0,fineL=clf[x.id]?clf[x.id].items:[];
+    return {m:x,meals:meals[x.id],food,dep,net,xS,nS,next,fine,fineL,total:net+xS+nS+next+fine};
   });
-  return {totalMeals,bazar,rate,n,xs,ns,xT,nT,rows,sh,rn,rentOn,rentT,othT};
+  return {totalMeals,bazar,totalDep,remain,rate,n,xs,ns,xT,nT,rows,sh,rn,rentOn,rentT,othT};
 }
 
 /* ---------- views ---------- */
@@ -425,17 +493,153 @@ async function shareImg(b,fname,text){
 async function sendDay(){shareImg(await dayBlob(),'meal-'+D+'.jpg',dl(D)+' মিল ও মেনু — '+dmy(D))}
 async function dlDay(){const b=await dayBlob();if(await nativeShare(b,'meal-'+D+'.jpg',dl(D)+' মিল ও মেনু'))return;const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='meal-'+D+'.jpg';a.click()}
 
+/* ---------- মন্তব্য (বেনামী অভিযোগ/পরামর্শ বক্স) ---------- */
+/* নাম কোথাও রাখা হয় না। দিনে একটির সীমা আর "একই খাবারে একবার মত" ঠিক রাখতে প্রতিটি ফোনে একটি গোপন কোড থাকে;
+   তা থেকে বানানো একমুখী টোকেন আলাদা জায়গায় জমা হয়, মন্তব্যের সাথে এর কোনো যোগ নেই। তাই ম্যানেজারও কারও পরিচয় জানতে পারেন না। */
+const CMMAX=20;
+let cmD={k:'g',t:'',f:''};
+const cmWords=t=>String(t||'').trim().split(/\s+/).filter(Boolean).length;
+const cyrb=str=>{let h1=0xdeadbeef,h2=0x41c6ce57;for(let i=0;i<str.length;i++){const c=str.charCodeAt(i);h1=Math.imul(h1^c,2654435761);h2=Math.imul(h2^c,1597334677)}h1=Math.imul(h1^(h1>>>16),2246822507)^Math.imul(h2^(h2>>>13),3266489909);h2=Math.imul(h2^(h2>>>16),2246822507)^Math.imul(h1^(h1>>>13),3266489909);return (4294967296*(2097151&h2)+(h1>>>0)).toString(36)};
+function cmSecret(){let v='';try{v=localStorage.getItem('cmsec')||''}catch(e){}if(!v){v=uid()+uid()+uid()+Date.now().toString(36);try{localStorage.setItem('cmsec',v)}catch(e){}}return v}
+const cmTok=(...a)=>cyrb(cmSecret()+'|'+a.join('|'));
+/* খাবারের নাম এক করে নেওয়া: ফাঁকা বাদ, শেষের "টা/টি/গুলো" বাদ */
+const foodKey=f=>String(f||'').toLowerCase().replace(/[\u200b-\u200d]/g,'').replace(/\s+/g,' ').trim().replace(/(গুলো|গুলি|খানা|টা|টি)$/,'').trim();
+function cmTally(list,k){
+  const m={};
+  list.filter(x=>x.k===k).forEach(x=>{const key=foodKey(x.food);if(!key)return;const o=m[key]||(m[key]={n:0,l:{}});o.n++;const raw=String(x.food).trim();o.l[raw]=(o.l[raw]||0)+1});
+  return Object.values(m).map(o=>({n:o.n,name:Object.entries(o.l).sort((a,b)=>b[1]-a[1])[0][0]})).sort((a,b)=>b.n-a.n||a.name.localeCompare(b.name,'bn'));
+}
+function cmChart(title,sub,rows,cls){
+  const top=rows.slice(0,6),mx=Math.max(1,...top.map(r=>r.n));
+  return `<div class="card"><h2>${title}</h2><p class="note" style="margin-top:-6px">${sub}</p>
+  ${top.length?`<div class="cmc ${cls}">${top.map(r=>`<div class="cmc-c"><em>${bn(r.n)}</em><div class="cmc-t"><i style="height:${Math.max(6,Math.round(r.n/mx*100))}%"></i></div><span>${esc(r.name)}</span></div>`).join('')}</div>${rows.length>6?`<p class="note">আরও ${bn(rows.length-6)}টি খাবারের নাম আছে, সবচেয়ে বেশি ভোট পাওয়া ৬টি দেখানো হলো।</p>`:''}`:'<div class="empty">এখনো কেউ বলেননি</div>'}</div>`;
+}
+function vCm(){
+  const list=Object.values(S.cm||{}).filter(x=>(x.date||'').startsWith(M)).sort((a,b)=>(b.t||0)-(a.t||0));
+  const used=!!(S.cmu&&S.cmu['d'+cmTok('d',today())]);
+  const kinds=[['g','সাধারণ'],['x','বাদ চাই'],['a','চালু চাই']];
+  const foods=[...new Set(Object.values(S.cm||{}).filter(x=>x.k===cmD.k&&x.food).map(x=>x.food))];
+  const feed=list.map(x=>`<div class="cm-m"><p>${esc(x.text)}</p><div class="cm-f">${x.k==='x'?`<b class="cm-tg bad">বাদ চাই · ${esc(x.food)}</b>`:x.k==='a'?`<b class="cm-tg good">চালু চাই · ${esc(x.food)}</b>`:''}<small>${dm(x.date)}</small></div></div>`).join('')||'<div class="empty">এই মাসে এখনো কোনো মন্তব্য নেই</div>';
+  const composer=used?`<p class="note" style="margin:0">আজকের মন্তব্য দেওয়া হয়ে গেছে। কাল আবার দিতে পারবেন।</p>`:
+  `<div class="cm-k">${kinds.map(k=>`<button type="button" class="cm-kb${cmD.k===k[0]?' on':''}" data-k="${k[0]}" onclick="cmKind('${k[0]}')">${k[1]}</button>`).join('')}</div>
+  <div id="cm-fw" class="row" style="${cmD.k==='g'?'display:none':''}"><input id="cm-f" list="cm-fl" maxlength="30" placeholder="খাবারের নাম (যেমন: ডিম ভর্তা)" value="${esc(cmD.f)}" oninput="cmD.f=this.value" style="flex:1"><datalist id="cm-fl">${foods.map(f=>`<option value="${esc(f)}">`).join('')}</datalist></div>
+  <div class="cm-b"><textarea id="cm-t" rows="2" placeholder="আপনার অভিযোগ বা পরামর্শ লিখুন…" oninput="cmInp(this)">${esc(cmD.t)}</textarea><button class="btn cm-s" onclick="cmSend()" aria-label="পাঠান"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg></button></div>
+  <p class="note" id="cm-c" style="margin:6px 0 0"></p>`;
+  return `${monthPick()}<div class="cmw"><div class="card cm-card"><h2>মন্তব্য কমিউনিটি</h2><p class="note" style="margin-top:-6px">নাম কোথাও দেখানো হয় না, ম্যানেজারও জানতে পারেন না। প্রতিদিন একজন সদস্য একটি মন্তব্য দিতে পারবেন, সর্বোচ্চ ${bn(CMMAX)} শব্দ।</p>
+  <div class="cm-fd">${feed}</div><div class="cm-cp">${composer}</div></div>
+  <div class="cm-ch">${cmChart('মেনু থেকে বিদায়','যে খাবার বাদ দিতে চান, কতজন বলেছেন',cmTally(list,'x'),'bad')}${cmChart('মেনুতে স্বাগতম','যে খাবার আগামী মাস থেকে চালু করতে চান, কতজন বলেছেন',cmTally(list,'a'),'good')}</div></div>`;
+}
+function cmCount(el){const n=cmWords(el.value),c=document.getElementById('cm-c');if(!c)return n;c.textContent=n?`${bn(n)}/${bn(CMMAX)} শব্দ`+(n>CMMAX?' — সীমা পার হয়েছে':''):'';c.className='note'+(n>CMMAX?' due':'');return n}
+function cmInp(el){cmD.t=el.value;cmCount(el)}
+function cmKind(k){cmD.k=k;document.querySelectorAll('.cm-kb').forEach(b=>b.classList.toggle('on',b.dataset.k===k));const w=document.getElementById('cm-fw');if(w)w.style.display=k==='g'?'none':'';
+  const dl=document.getElementById('cm-fl');if(dl)dl.innerHTML=[...new Set(Object.values(S.cm||{}).filter(x=>x.k===k&&x.food).map(x=>x.food))].map(f=>`<option value="${esc(f)}">`).join('')}
+function cmSend(){
+  if(!role)return;
+  const text=cmD.t.trim().replace(/\s+/g,' '),n=cmWords(text),k=cmD.k,food=cmD.f.trim().replace(/\s+/g,' '),d=today();
+  if(!n){alert('আগে মন্তব্য লিখুন');return}
+  if(n>CMMAX){alert('মন্তব্য সর্বোচ্চ '+bn(CMMAX)+' শব্দের হতে পারবে। এখন '+bn(n)+' শব্দ আছে।');return}
+  const dT='d'+cmTok('d',d);
+  if(S.cmu[dT]){alert('আজকের মন্তব্য দেওয়া হয়ে গেছে। কাল আবার দিতে পারবেন।');render();return}
+  const tks=[dT];
+  if(k!=='g'){
+    if(!foodKey(food)){alert('খাবারের নাম লিখুন');return}
+    const fT='f'+cmTok('f',d.slice(0,7),k,foodKey(food));
+    if(S.cmu[fT]){alert('এই মাসে এই খাবারের জন্য আপনি আগেই মত দিয়েছেন।');return}
+    tks.push(fT);
+  }
+  const id=uid(),e={id,date:d,t:Date.now(),k,text};if(k!=='g')e.food=food;
+  S.cm[id]=e;tks.forEach(t=>S.cmu[t]=1);
+  try{localStorage.setItem(KEY,JSON.stringify(S))}catch(x){}
+  cmD={k:'g',t:'',f:''};
+  if(CLOUD&&window.cloud&&window.cloud.cm)window.cloud.cm(id,e,tks);else if(isM())save();else alert('এখনো সার্ভারের সাথে সংযোগ হয়নি, একটু পরে আবার চেষ্টা করুন');
+  render()}
+function vClean(){
+  const sl=clSlots(M),mgr=isM(),t=today();
+  const fines=sl.filter(x=>x.st==='miss'),fT=fines.length*CL_FINE;
+  const row=x=>{
+    const mine=!!me&&x.mid===me,can=mgr||(mine&&x.st==='now'&&!x.rec);
+    const badge=x.st==='done'?`<span class="cl-b ok">✓ পরিষ্কার করেছেন${x.rec.d?' · '+dm(x.rec.d):''}${x.rec.by==='m'?' <small>(ম্যানেজার চিহ্নিত)</small>':''}</span>`
+      :x.st==='miss'?`<span class="cl-b due">সময় শেষ · জরিমানা ৳${f2(CL_FINE)}</span>`
+      :x.st==='now'?`<span class="cl-b now">এখন পালা চলছে · শেষ তারিখ ${dm(x.e)}</span>`
+      :`<span class="cl-b soon">আসছে · ${dm(x.s)} থেকে</span>`;
+    const btn=(mine&&x.st==='now'&&!x.rec)?`<button class="btn" onclick="clMark('${x.key}')">পরিষ্কার করেছি</button>`
+      :mgr?`<button class="btn alt cl-m" onclick="clMark('${x.key}')">${x.rec?'চিহ্ন তুলুন':'চিহ্নিত করুন'}</button>`:'';
+    return `<div class="cl-r ${x.st}${mine?' me':''}"><div class="cl-l"><div class="cl-n"><b>${esc(x.name)}</b>${mine?' <em class="nd-me">আপনি</em>':''}<span>${clRange(x.w,M)}</span></div>${badge}</div>${btn}${mgr&&!x.mid?'<small class="due">অ্যাপের সদস্য তালিকায় এই নামে কেউ নেই, তাই জরিমানা যোগ হবে না</small>':''}</div>`};
+  const rooms=CL_ROOMS.map(R=>`<div class="card"><h2>${R.n}</h2>${sl.filter(x=>x.room===R.n).map(row).join('')}</div>`).join('');
+  return monthPick()+`<div class="card"><h2>ওয়াশরুম পরিচ্ছন্নতা — ${mn(M)}</h2>
+  <p class="note" style="margin-top:-6px">প্রত্যেকে নিজের নির্ধারিত তারিখের মধ্যে ওয়াশরুম পরিষ্কার করে “পরিষ্কার করেছি” চাপবেন। সময়ের মধ্যে না চাপলে মাসের হিসাবে স্বয়ংক্রিয়ভাবে ৳${f2(CL_FINE)} জরিমানা যোগ হবে। দুই রুমেই একই সময়সূচি: ১ম জন ${clRange(CL_WIN[0],M)}, ২য় জন ${clRange(CL_WIN[1],M)}, ৩য় জন ${clRange(CL_WIN[2],M)}।</p>
+  ${fines.length?`<div class="sum"><div><b class="due">${bn(fines.length)} জন</b><span>সময়ে করেননি</span></div><div><b class="due">৳${f2(fT)}</b><span>মোট জরিমানা</span></div></div>`:'<p class="note" style="margin:0">এখন পর্যন্ত কারও জরিমানা নেই।</p>'}</div>
+  <div class="clw">${rooms}</div>`;
+}
+function clMark(key){
+  const x=clSlots(M).find(v=>v.key===key);if(!x)return;
+  const mgr=isM(),mine=!!me&&x.mid===me;
+  S.cl=S.cl||{};S.cl[M]=S.cl[M]||{};
+  let rec;
+  if(x.rec){
+    if(!mgr)return;
+    if(!confirm(x.name+'-এর পরিষ্কারের চিহ্ন তুলে নেবেন? সময় পার হয়ে গেলে জরিমানা আবার যোগ হবে।'))return;
+    delete S.cl[M][key];rec=null;
+  }else{
+    if(!(mgr||(mine&&x.st==='now'))){alert('নির্ধারিত তারিখের মধ্যেই শুধু নিজে চিহ্নিত করা যাবে।');return}
+    if(!confirm(mine?'ওয়াশরুম পরিষ্কার করা হয়েছে বলে নিশ্চিত করছেন?':x.name+'-এর পক্ষে “পরিষ্কার হয়েছে” চিহ্নিত করবেন?'))return;
+    rec={d:today(),by:(mine&&x.st==='now')?'s':'m'};S.cl[M][key]=rec;
+  }
+  try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}
+  if(CLOUD&&window.cloud&&window.cloud.cl)window.cloud.cl(M,key,rec);else save();
+  render()}
+
+let needTo='',needTo2='';
+const nTos=n=>Array.isArray(n.tos)?n.tos:(n.to?[n.to]:[]);
+
+function vNeeds(){
+  const all=Object.values(S.needs||{}).sort((a,b)=>(!!a.done-!!b.done)||(b.t||0)-(a.t||0));
+  const left=all.filter(n=>!n.done).length;
+  const row=n=>{
+    const tos=nTos(n),mine=!!me&&tos.includes(me),can=isM()||mine;
+    return `<div class="nd-i${n.done?' dn':''}"><div class="li-m"><b>${esc(n.item)}${n.qty?` <small>— ${esc(n.qty)}</small>`:''}</b>
+    <span>দায়িত্বে: ${tos.map(i=>esc(mem(i).name)).join(' ও ')}${mine&&!n.done?' <em class="nd-me">আপনি</em>':''}${n.done?' · <span class="ok">কেনা হয়েছে</span>':''}</span></div>
+    <div class="nd-a">${can?`<button class="btn alt nd-b" onclick="togNeed('${n.id}')">${n.done?'আবার বাকি':'কেনা হয়েছে'}</button>`:''}${isM()?`<button class="x" aria-label="মুছুন" onclick="delNeed('${n.id}')">×</button>`:''}</div></div>`};
+  const sel=needTo||(S.members[0]&&S.members[0].id)||'';
+  return `<div class="card"><h2>বাসায় কি কি লাগবে?${all.length?` <small style="font-weight:400">— বাকি ${bn(left)}টি</small>`:''}</h2>
+  ${isM()?`<div class="row"><input id="ni" placeholder="কী লাগবে (যেমন: চাল, তেল)" style="flex:1;min-width:140px"><input id="nq" placeholder="পরিমাণ (ঐচ্ছিক)" style="width:130px"></div>
+  <div class="row"><label class="nd-l">১ম দায়িত্বপ্রাপ্ত<select id="nt" onchange="needTo=this.value" style="width:100%">${S.members.map(x=>`<option value="${x.id}" ${sel===x.id?'selected':''}>${esc(x.name)}</option>`).join('')}</select></label>
+  <label class="nd-l">২য় দায়িত্বপ্রাপ্ত (ঐচ্ছিক)<select id="nt2" onchange="needTo2=this.value" style="width:100%"><option value="">— কেউ নেই —</option>${S.members.map(x=>`<option value="${x.id}" ${needTo2===x.id?'selected':''}>${esc(x.name)}</option>`).join('')}</select></label></div>
+  <div class="row"><button class="btn" style="width:100%" onclick="addNeed()">যোগ করুন</button></div>
+  <p class="note">এক বা দুইজনকে দায়িত্ব দিতে পারবেন, তাঁরা গিয়ে জিনিসগুলো কিনে আনবেন। কেনা হলে তাঁদের যেকোনো একজন (বা ম্যানেজার) “কেনা হয়েছে” চাপবেন।</p>`:''}
+  ${all.map(row).join('')||'<div class="empty">এখন কিছু লাগবে না</div>'}</div>`;
+}
+function addNeed(){
+  if(!isM())return;const item=bazarV('ni').trim(),to=bazarV('nt'),to2=bazarV('nt2');
+  if(!item){alert('কী লাগবে লিখুন');return}
+  if(!to){alert('অন্তত একজন দায়িত্বপ্রাপ্ত ব্যক্তি বেছে নিন');return}
+  if(to2&&to2===to){alert('একই ব্যক্তিকে দুইবার দেওয়া যাবে না');return}
+  const id=uid();S.needs=S.needs||{};S.needs[id]={id,item,qty:bazarV('nq').trim(),tos:to2?[to,to2]:[to],done:false,t:Date.now()};
+  needTo2='';save();render()}
+function togNeed(id){
+  const n=S.needs&&S.needs[id];if(!n)return;if(!(isM()||(me&&nTos(n).includes(me))))return;
+  n.done=!n.done;n.doneBy=n.done?me:'';
+  try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}
+  if(CLOUD&&window.cloud&&window.cloud.need)window.cloud.need(id,n.done,n.doneBy);else save();
+  render()}
+function delNeed(id){if(!isM())return;if(!confirm('তালিকা থেকে মুছে ফেলবেন?'))return;delete S.needs[id];save();render()}
+
 function vBazar(){
   const list=S.bazar.filter(b=>b.date.startsWith(M)).sort((a,b)=>b.date.localeCompare(a.date));
   const tot=list.reduce((a,b)=>a+b.amt,0);
-  return monthPick()+(isM()?`<div class="card"><h2>বাজার লিখুন</h2>
+  const sel=bazM||me;
+  return monthPick()+`<div class="card"><h2>বাজার লিখুন</h2>
   <div class="row">${dinp('bd',today())}<input id="bi" placeholder="কী কী কেনা হলো" style="flex:1;min-width:140px"></div>
-  <div class="row"><input id="ba" type="number" inputmode="decimal" min="0" placeholder="টাকা" style="width:100px"><select id="bb" onchange="bazM=this.value" style="flex:1">${S.members.map(x=>`<option value="${x.id}" ${bazM===x.id?'selected':''}>${esc(x.name)}</option>`).join('')}</select></div>
-  <button class="btn" style="width:100%" onclick="addBazar()">সেভ করুন</button><p class="note">সেভ করার পর বাজার আর এডিট বা মোছা যাবে না।</p></div>`:'')+`
+  <div class="row"><input id="ba" type="number" inputmode="decimal" min="0" placeholder="টাকা" style="width:100px"><select id="bb" onchange="bazM=this.value" style="flex:1">${S.members.map(x=>`<option value="${x.id}" ${sel===x.id?'selected':''}>${esc(x.name)}</option>`).join('')}</select></div>
+  <button class="btn" style="width:100%" onclick="addBazar()">সেভ করুন</button><p class="note">সেভ করার পর বাজার আর এডিট বা মোছা যাবে না।</p></div>`+`
   <div class="card"><h2>এই মাসের বাজার — ৳${f2(tot)}</h2>
-  ${list.map(b=>li(esc(b.item),dm(b.date)+' · '+esc(mem(b.by).name),'৳'+f2(b.amt),'bazar',b.id)).join('')||'<div class="empty">এখনো কোনো বাজার নেই</div>'}</div>`;
+  ${list.map(b=>li(esc(b.item),dm(b.date)+' · '+esc(mem(b.by).name),'৳'+f2(b.amt),'bazar',b.id)).join('')||'<div class="empty">এখনো কোনো বাজার নেই</div>'}</div>`+vNeeds();
 }
-function addBazar(){if(!isM())return;const a=+bazarV('ba');if(!a){alert('টাকার পরিমাণ লিখুন');return}if(!confirm('বাজার সেভ করবেন? সেভ করার পর আর এডিট বা মোছা যাবে না।'))return;S.bazar.push({id:uid(),date:bazarV('bd'),item:bazarV('bi')||'বাজার',amt:a,by:bazarV('bb'),locked:true});save();render()}
+function addBazar(){if(!role)return;const a=+bazarV('ba');if(!a){alert('টাকার পরিমাণ লিখুন');return}if(!confirm('বাজার সেভ করবেন? সেভ করার পর আর এডিট বা মোছা যাবে না।'))return;const e={id:uid(),date:bazarV('bd'),item:bazarV('bi')||'বাজার',amt:a,by:bazarV('bb'),locked:true};
+  S.bazar.push(e);
+  /* ম্যানেজার হলে পুরো ডাটা সেভ; সদস্য হলে শুধু এই এন্ট্রিটি ক্লাউডে যোগ হবে (অন্যের ডাটা ওভাররাইট হবে না) */
+  if(isM())save();else{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(x){}if(CLOUD&&window.cloud&&window.cloud.bazar)window.cloud.bazar(e);else alert('এখনো সার্ভারের সাথে সংযোগ হয়নি, একটু পরে আবার চেষ্টা করুন')}
+  render()}
 const bazarV=i=>document.getElementById(i).value;
 const li=(t,sub,amt,k,id)=>`<div class="li"><div class="li-m"><b>${t}</b>${sub?`<span>${sub}</span>`:''}</div>${amt!==''?`<div class="li-a">${amt}</div>`:''}${isM()&&k!=='bazar'?`<button class="x" aria-label="মুছুন" onclick="del('${k}','${id}')">×</button>`:''}</div>`;
 function del(k,id){if(!isM()||k==='bazar')return;if(!confirm('মুছে ফেলবেন?'))return;S[k]=S[k].filter(x=>x.id!==id);save();render()}
@@ -466,19 +670,21 @@ function vBill(){
   const c=calc(M),A=mn(M),B=mn(nxt(M)),nd=S.nd[M]||{};
   const kv=(a,b,cl)=>`<div class="kv"><span>${a}</span><b${cl?` class="${cl}"`:''}>${b}</b></div>`;
   return `<div class="row"><label>বিগত মাস (যে মাসের হিসাব করছেন): <input type="month" value="${M}" onchange="M=this.value;render()"></label></div>
-  <div class="card"><h2>${A} মাসের হিসাব</h2><div class="big">
-  <div><b>${bn(c.totalMeals)}</b><span>মোট মিল</span></div><div><b>৳${f2(c.bazar)}</b><span>মোট বাজার</span></div>
-  <div><b>৳${f2(c.rate)}</b><span>মিল রেট</span></div>
+  <div class="card"><h2>${A} মাসের হিসাব</h2><div class="big lay">
+  <div class="bt"><p><span>মোট জমা</span><b>৳${f2(c.totalDep)}</b></p><p><span>মোট বাজার</span><b>৳${f2(c.bazar)}</b></p><p class="bt-r"><span>${c.remain<0?'ঘাটতি (বাজার বেশি)':'অবশিষ্ট টাকা'}</span><b${c.remain<0?' class="due"':''}>${c.remain<0?'−':''}৳${f2(Math.abs(c.remain))}</b></p></div>
   <div><b>৳${f2(c.rentOn?c.othT(c.xs)/c.n:c.xT/c.n)}</b><span>আনুষাঙ্গিক খরচ, জনপ্রতি${c.rentOn&&c.rentT(c.xs)?' (ভাড়া বাদে)':''} (মোট ৳${f2(c.xT)})</span></div>
-  <div><b>৳${f2(c.rentOn?c.othT(c.ns)/c.n:c.nT/c.n)}</b><span>${B}-এর বিল, জনপ্রতি${c.rentOn&&c.rentT(c.ns)?' (ভাড়া বাদে)':''} (মোট ৳${f2(c.nT)})</span></div>${c.rentOn&&(c.rentT(c.xs)+c.rentT(c.ns))?`<div><b>৳${f2((c.rentT(c.xs)+c.rentT(c.ns))/c.rn)}</b><span>বাসা ভাড়া, জনপ্রতি (মোট ৳${f2(c.rentT(c.xs)+c.rentT(c.ns))} ÷ ${bn(c.rn)} জন)</span></div>`:''}</div></div>
+  <div><b>${bn(c.totalMeals)}</b><span>মোট মিল</span></div>
+  <div><b>৳${f2(c.rate)}</b><span>মিল রেট</span></div>
+  <div><b>৳${f2(c.rentOn?c.othT(c.ns)/c.n:c.nT/c.n)}</b><span>${B}-এর বিল, জনপ্রতি${c.rentOn&&c.rentT(c.ns)?' (ভাড়া বাদে)':''} (মোট ৳${f2(c.nT)})</span></div>${c.rentOn&&(c.rentT(c.xs)+c.rentT(c.ns))?`<div class="bw"><b>৳${f2((c.rentT(c.xs)+c.rentT(c.ns))/c.rn)}</b><span>বাসা ভাড়া, জনপ্রতি (মোট ৳${f2(c.rentT(c.xs)+c.rentT(c.ns))} ÷ ${bn(c.rn)} জন)</span></div>`:''}
+  </div></div>
   <div class="card"><h2>${B} মাসের খাবার বাবদ জমা</h2>
   ${isM()?`<div class="row"><input id="nda" type="number" inputmode="decimal" min="0" placeholder="সবার জন্য টাকা" style="flex:1"><button class="btn alt" onclick="allND()">সবাইকে বসান</button></div>`:''}
   ${S.members.map(x=>`<div class="row"><span style="flex:1;min-width:0;overflow-wrap:anywhere">${esc(x.name)}</span>${isM()?`<input type="number" inputmode="decimal" min="0" value="${nd[x.id]||''}" onchange="setND('${x.id}',this.value)" style="width:120px">`:`<b>৳${f2(+nd[x.id]||0)}</b>`}</div>`).join('')}</div>
   <div class="card"><h2>জনপ্রতি হিসাব</h2><p class="note" style="margin-top:-6px">নামে চাপলে বিস্তারিত ও পাঠানোর বাটন দেখা যাবে।</p>
   ${c.rows.map(r=>{const neg=r.total<0;return `<details class="pc" ${bOpen.has(r.m.id)?'open':''} ontoggle="tgB('${r.m.id}',this.open)"><summary><span class="pc-n">${esc(r.m.name)}</span><span class="pc-t ${neg?'ok':'due'}">${neg?'<small>ফেরত</small>':''}৳${f2(Math.abs(r.total))}</span></summary>
-  ${kv('মিল',bn(r.meals))}${kv('খাবার খরচ','৳'+f2(r.food))}${kv(A+' জমা','৳'+f2(r.dep))}${kv('ঘাটতি / অবশিষ্ট',(r.net>0?'+':'−')+f2(Math.abs(r.net)),r.net>0?'due':'ok')}${kv('আনুষাঙ্গিক','৳'+f2(r.xS))}${kv(B+' বিল','৳'+f2(r.nS))}${kv(B+' খাবার জমা','৳'+f2(r.next))}${kv(neg?'ফেরত পাবেন':'মোট দিতে হবে','৳'+f2(Math.abs(r.total)),neg?'ok':'due')}
+  ${kv('মিল',bn(r.meals))}${kv('খাবার খরচ','৳'+f2(r.food))}${kv(A+' জমা','৳'+f2(r.dep))}${kv('ঘাটতি / অবশিষ্ট',(r.net>0?'+':'−')+f2(Math.abs(r.net)),r.net>0?'due':'ok')}${kv('আনুষাঙ্গিক','৳'+f2(r.xS))}${r.fine?kv('পরিচ্ছন্নতা জরিমানা','৳'+f2(r.fine),'due'):''}${kv(B+' বিল','৳'+f2(r.nS))}${kv(B+' খাবার জমা','৳'+f2(r.next))}${kv(neg?'ফেরত পাবেন':'মোট দিতে হবে','৳'+f2(Math.abs(r.total)),neg?'ok':'due')}
   <div class="row"><button class="btn wa" onclick="sendBill('${r.m.id}')">হোয়াটসঅ্যাপে পাঠান</button><button class="btn alt" onclick="dlBill('${r.m.id}')">ছবি সেভ করুন</button></div></details>`}).join('')}
-  <p class="note">মোট = (মিল × রেট − জমা) + আনুষাঙ্গিক ভাগ + ${B}-এর বিলের ভাগ + ${B}-এর খাবার জমা। জমার চেয়ে খাবার কম খেলে অবশিষ্ট টাকা সব হিসাবের শেষে বাদ যায়, বেশি খেলে ঘাটতি যোগ হয়।</p></div>`;
+  <p class="note">মোট = (মিল × রেট − জমা) + আনুষাঙ্গিক ভাগ + ${B}-এর বিলের ভাগ + ${B}-এর খাবার জমা + পরিচ্ছন্নতা জরিমানা (থাকলে)। জমার চেয়ে খাবার কম খেলে অবশিষ্ট টাকা সব হিসাবের শেষে বাদ যায়, বেশি খেলে ঘাটতি যোগ হয়।</p></div>`;
 }
 function setND(id,v){if(!isM())return;S.nd[M]=S.nd[M]||{};S.nd[M][id]=Math.max(0,+v||0);save();render()}
 function allND(){if(!isM())return;const v=+bazarV('nda')||0;S.nd[M]={};S.members.forEach(x=>S.nd[M][x.id]=v);save();render()}
@@ -499,9 +705,11 @@ function billLines(r,c){
   L.push({a:`${B} মাসের বিলের আপনার অংশ`,b:'৳'+f2(r.nS),s:1});
   L.push({h:`৪। ${B} মাসের খাবার বাবদ জমা`});
   L.push({a:'নতুন মাসের জন্য জমা',b:'৳'+f2(r.next),s:1});
-  L.push({h:'৫। সর্বমোট'});
-  if(r.net>0)L.push({a:'১ (ঘাটতি) + ২ + ৩ + ৪',b:`${f2(r.net)} + ${f2(r.xS)} + ${f2(r.nS)} + ${f2(r.next)}`});
-  else{L.push({a:'২ + ৩ + ৪ এর যোগফল',b:'৳'+f2(r.xS+r.nS+r.next)});L.push({a:`${A} মাসের অবশিষ্ট জমা বাদ`,b:'− ৳'+f2(-r.net)})}
+  if(r.fine){L.push({h:'৫। পরিচ্ছন্নতা জরিমানা (সময়ে পরিষ্কার না করায়)'});r.fineL.forEach(x=>L.push({a:`${x.room}-এর পালা (${clRange(x.w,M)})`,b:'৳'+f2(CL_FINE)}));L.push({a:'জরিমানা মোট',b:'৳'+f2(r.fine),s:1})}
+  const FN=r.fine?' + ৫':'',FV=r.fine?' + '+f2(r.fine):'';
+  L.push({h:(r.fine?'৬':'৫')+'। সর্বমোট'});
+  if(r.net>0)L.push({a:'১ (ঘাটতি) + ২ + ৩ + ৪'+FN,b:`${f2(r.net)} + ${f2(r.xS)} + ${f2(r.nS)} + ${f2(r.next)}${FV}`});
+  else{L.push({a:'২ + ৩ + ৪'+FN+' এর যোগফল',b:'৳'+f2(r.xS+r.nS+r.next+r.fine)});L.push({a:`${A} মাসের অবশিষ্ট জমা বাদ`,b:'− ৳'+f2(-r.net)})}
   L.push({a:r.total<0?'আপনি ফেরত পাবেন':`${B} মাসের জন্য মোট দিতে হবে`,b:'৳'+f2(Math.abs(r.total)),t:r.total<0?0:1});
   return L;
 }
@@ -512,6 +720,8 @@ function mainLines(c){
   L.push({a:`${A} মাসের মোট মিল`,b:bn(c.totalMeals)});
   L.push({a:`${A} মাসের মোট বাজার`,b:'৳'+f2(c.bazar)});
   L.push({a:'মিল রেট',b:'৳'+f2(c.rate),s:1});
+  L.push({a:`${A} মাসের মোট জমা`,b:'৳'+f2(c.totalDep)});
+  L.push({a:c.remain<0?'ঘাটতি (বাজার বেশি)':'অবশিষ্ট টাকা',b:(c.remain<0?'− ':'')+'৳'+f2(Math.abs(c.remain)),s:1});
   L.push({h:`${A} মাসের আনুষাঙ্গিক খরচ`});
   c.xs.forEach(e=>L.push({a:e.name,b:'৳'+f2(e.amt)}));
   if(!c.xs.length)L.push({a:'কোনো খরচ নেই',b:'৳০'});
@@ -772,7 +982,7 @@ function render(){
   document.getElementById('ttl').textContent=!role?'স্বাগতম':TTL[tab];
   document.getElementById('hr').innerHTML=(CLOUD&&role&&!mgr)?'<button class="btn alt" style="min-height:36px;padding:4px 12px;color:inherit;background:rgba(255,255,255,.2);border-color:rgba(255,255,255,.45)" onclick="logout()">বের হন</button>':'';
   const back=(tab==='mem'||tab==='cook'||tab==='mgr')?'<button class="back" onclick="go(\'more\')">‹ আরও</button>':'';
-  document.getElementById('app').innerHTML=!role?vLogin():back+{meal:()=>mgr?vMeal()+vMenu()+vWam():vMy(),bazar:vBazar,acc:vAcc,bill:vBill,more:vMore,mgr:vMgr,mem:vMem,cook:vCook}[tab]();
+  document.getElementById('app').innerHTML=!role?vLogin():back+{meal:()=>mgr?vMeal()+vMenu()+vWam():vMy(),bazar:vBazar,acc:vAcc,bill:vBill,cm:vCm,cl:vClean,more:vMore,mgr:vMgr,mem:vMem,cook:vCook}[tab]();
 }
 if(navigator.storage&&navigator.storage.persist)navigator.storage.persist().catch(()=>{});
 if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
@@ -788,6 +998,10 @@ if(window.FB&&FB.apiKey){
     window.cloud={
       push(){F.setDoc(ref,JSON.parse(JSON.stringify(S))).catch(e=>alert('সেভ হয়নি: '+e.message))},
       meal(d,id,a){F.updateDoc(ref,new F.FieldPath('days',d,'meals',id),a).catch(e=>alert('সেভ হয়নি: '+e.message))},
+      cl(m,key,rec){F.updateDoc(ref,new F.FieldPath('cl',m,key),rec===null?F.deleteField():rec).catch(x=>alert('সেভ হয়নি: '+x.message))},
+      cm(id,e,tks){const a=[ref,new F.FieldPath('cm',id),e];tks.forEach(t=>a.push(new F.FieldPath('cmu',t),true));F.updateDoc(...a).catch(x=>alert('সেভ হয়নি: '+x.message))},
+      need(id,done,by){F.updateDoc(ref,new F.FieldPath('needs',id,'done'),done,new F.FieldPath('needs',id,'doneBy'),by||'').catch(x=>alert('সেভ হয়নি: '+x.message))},
+      bazar(e){F.updateDoc(ref,'bazar',F.arrayUnion(e)).catch(x=>alert('সেভ হয়নি: '+x.message))},
       lock(d,id,a){F.updateDoc(ref,new F.FieldPath('days',d,'meals',id),a,new F.FieldPath('days',d,'lk',id),true).catch(e=>alert('সেভ হয়নি: '+e.message))},
       enter(name,phone,mode){
         return F.runTransaction(db,async tx=>{
@@ -805,7 +1019,7 @@ if(window.FB&&FB.apiKey){
       }
     };
     F.onSnapshot(ref,snap=>{
-      if(snap.exists())S=Object.assign({members:[],days:{},bazar:[],deposits:[],extras:[],open:{},nd:{},cooks:[]},snap.data());
+      if(snap.exists())S=Object.assign({members:[],days:{},bazar:[],deposits:[],extras:[],open:{},nd:{},cooks:[],needs:{},cm:{},cmu:{},cl:{}},snap.data());
       try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}
       window.cloudReady=true;
       const el=document.activeElement;
