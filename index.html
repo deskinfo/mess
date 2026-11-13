@@ -581,14 +581,15 @@ function vClean(){
       :x.st==='miss'?`<span class="cl-b due">সময় শেষ · জরিমানা ৳${f2(CL_FINE)}</span>`
       :x.st==='now'?`<span class="cl-b now">এখন পালা চলছে · শেষ তারিখ ${dm(x.e)}</span><span class="cl-c"><i class="${x.sd?'y':''}">${x.sd?'✓ নিজে জানিয়েছেন':'নিজে জানাননি'}</i><i class="${x.ap?'y':''}">${x.ap?'✓ সম্মতি: '+apN:'সম্মতি বাকি'}</i></span>`
       :`<span class="cl-b soon">আসছে · ${dm(x.s)} থেকে</span>`;
-    const selfB=(mine&&live&&!x.sd)?`<button class="btn" onclick="clSelf('${x.key}')">পরিষ্কার করেছি</button>`:'';
+    const mgOv=mgr&&!mine,selfOn=(mine&&live&&!x.sd)||(mgOv&&!x.done),doneTxt=x.done||(x.sd&&!mgOv);
+    const selfB=`<button class="btn" ${selfOn?'':'disabled'} onclick="clConfirm('${x.key}')">${doneTxt?'✓ নিশ্চিত করা হয়েছে':'নিশ্চিত করুন'}</button>`;
     const apOn=live&&isMate&&!x.ap,apTxt=x.ap?'✓ সম্মতি দেওয়া হয়েছে':'সম্মতি দিন';
     const apB=`<button class="btn alt" ${apOn?'':'disabled'} onclick="clApprove('${x.key}')">${apTxt}</button>`;
-    const mgB=mgr?`<button class="btn alt cl-m" onclick="clMgr('${x.key}')">${x.done||x.sd||x.ap?'চিহ্ন তুলুন':'চিহ্নিত করুন'}</button>`:'';
+    const mgB=(mgr&&(x.done||x.sd||x.ap))?`<button class="btn alt cl-m" onclick="clUndo('${x.key}')">চিহ্ন তুলুন</button>`:'';
     return `<div class="cl-r ${x.st}${mine?' me':''}"><div class="cl-l"><div class="cl-n"><b>${esc(x.name)}</b>${mine?' <em class="nd-me">আপনি</em>':''}<span>${clRange(x.w,M)}</span></div>${badge}</div><div class="cl-a">${selfB}${apB}${mgB}</div>${mgr&&!x.mid?'<small class="due">অ্যাপের সদস্য তালিকায় এই নামে কেউ নেই, তাই জরিমানা বা সম্মতি কাজ করবে না</small>':''}</div>`};
   const rooms=CL_ROOMS.map(R=>`<div class="card"><h2>${R.n}</h2>${sl.filter(x=>x.room===R.n).map(row).join('')}</div>`).join('');
   return monthPick()+`<div class="card"><h2>ওয়াশরুম পরিচ্ছন্নতা — ${mn(M)}</h2>
-  <p class="note" style="margin-top:-6px">যার পালা, তিনি নির্ধারিত তারিখের মধ্যে ওয়াশরুম পরিষ্কার করে “পরিষ্কার করেছি” চাপবেন। এরপর একই রুমের বাকি দুইজনের যেকোনো একজন নিজের ফোন থেকে “সম্মতি দিন” চেপে নিশ্চিত করবেন যে সত্যিই পরিষ্কার হয়েছে। দুটোই সময়ের মধ্যে না হলে মাসের হিসাবে স্বয়ংক্রিয়ভাবে ৳${f2(CL_FINE)} জরিমানা যোগ হবে। সময়সূচি (দুই রুমেই): ১ম জন ${clRange(CL_WIN[0],M)}, ২য় জন ${clRange(CL_WIN[1],M)}, ৩য় জন ${clRange(CL_WIN[2],M)}। “সম্মতি দিন” বাটন শুধু যার পালা চলছে তার নামের পাশেই চালু থাকে।</p>
+  <p class="note" style="margin-top:-6px">প্রত্যেকেই নির্ধারিত সময়ের মধ্যে ওয়াশরুম পরিস্কার করুন এবং “নিশ্চিত করুন” বাটনে চাপ দিয়ে আপনার রুমের অন্য কোন সদস্যকে যাচাই করে “সম্মতি দিন” বাটন চেপে আপনাকে মুক্তি দিতে বলুন। নির্ধারিত সময়ের মধ্যে এই দুই বাটনে সিগনাল না পেলে মাসের হিসাবে স্বয়ংক্রিয়ভাবে ৳${f2(CL_FINE)} জরিমানা যোগ হবে।</p>
   ${fines.length?`<div class="sum"><div><b class="due">${bn(fines.length)} জন</b><span>সময়ে সম্পন্ন করেননি</span></div><div><b class="due">৳${f2(fT)}</b><span>মোট জরিমানা</span></div></div>`:'<p class="note" style="margin:0">এখন পর্যন্ত কারও জরিমানা নেই।</p>'}</div>
   <div class="clw">${rooms}</div>`;
 }
@@ -600,18 +601,24 @@ function clSet(x,f,v){
   if(CLOUD&&window.cloud&&window.cloud.cl)window.cloud.cl(M,x.key,f,v);else save();
   render()}
 const clGet=key=>clSlots(M).find(v=>v.key===key);
-function clSelf(key){
-  const x=clGet(key);if(!x||!me||x.mid!==me||x.st!=='now'||x.sd)return;
-  if(!confirm('ওয়াশরুম পরিষ্কার করা হয়েছে বলে নিশ্চিত করছেন? এরপর রুমমেটের সম্মতিও লাগবে।'))return;
-  clSet(x,'sd',today())}
+function clConfirm(key){
+  const x=clGet(key);if(!x)return;
+  const mine=!!me&&x.mid===me;
+  if(mine&&x.st==='now'&&!x.sd){
+    if(!confirm('ওয়াশরুম পরিষ্কার করা হয়েছে বলে নিশ্চিত করছেন? এরপর রুমমেটের সম্মতিও লাগবে।'))return;
+    clSet(x,'sd',today());return}
+  /* ম্যানেজার অন্যের পক্ষে নিশ্চিত করলে সম্মতি ছাড়াই পুরোপুরি সম্পন্ন ধরা হয় */
+  if(isM()&&!mine&&!x.done){
+    if(!confirm(x.name+'-এর পক্ষে ম্যানেজার হিসেবে “পরিষ্কার হয়েছে” নিশ্চিত করবেন? এতে রুমমেটের সম্মতি ছাড়াই সম্পন্ন ধরা হবে।'))return;
+    clSet(x,'mg',today())}}
 function clApprove(key){
   const x=clGet(key);if(!x||!me||!x.mates.includes(me)||x.st!=='now'||x.ap)return;
   if(!confirm('নিশ্চিত করছেন যে '+x.name+' ওয়াশরুম পরিষ্কার করেছেন?'))return;
   clSet(x,'ap',{id:me,d:today()})}
-function clMgr(key){
+function clUndo(key){
   const x=clGet(key);if(!x||!isM())return;
-  if(x.done||x.sd||x.ap){if(!confirm(x.name+'-এর সব চিহ্ন (নিজের জানানো ও সম্মতি) তুলে নেবেন? সময় পার হয়ে গেলে জরিমানা আবার যোগ হবে।'))return;clSet(x,null,null)}
-  else{if(!confirm(x.name+'-এর পক্ষে পুরোপুরি “পরিষ্কার হয়েছে” চিহ্নিত করবেন?'))return;clSet(x,'mg',today())}}
+  if(!confirm(x.name+'-এর সব চিহ্ন (নিশ্চিত করা ও সম্মতি) তুলে নেবেন? সময় পার হয়ে গেলে জরিমানা আবার যোগ হবে।'))return;
+  clSet(x,null,null)}
 
 let needTo='',needTo2='';
 const nTos=n=>Array.isArray(n.tos)?n.tos:(n.to?[n.to]:[]);
