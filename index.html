@@ -172,6 +172,8 @@ h2{font-size:17px}
 .st{display:flex;align-items:center;justify-content:space-between;gap:4px;background:var(--sf);border:1px solid var(--ln);border-radius:14px;padding:3px}
 .st button{width:44px;height:44px;border:0;border-radius:11px;background:var(--bg);color:var(--ac);font-size:26px;font-weight:600;line-height:1;padding:0;cursor:pointer}
 .st b{flex:1;text-align:center;font-size:22px}
+.st .sv{flex:1;min-width:0;width:100%;height:44px;text-align:center;font-size:22px;font-weight:700;font-family:inherit;color:inherit;background:transparent;border:0;border-radius:11px;padding:0;margin:0;outline:none;box-shadow:none;-webkit-appearance:none;appearance:none}
+.st .sv:focus{background:var(--bg);box-shadow:0 0 0 2px var(--ac)}
 .big1{display:block;text-align:center;font-size:22px;padding:8px 0}
 .sum{display:flex;gap:8px;margin:2px 0 12px}
 .sum div{flex:1;text-align:center;background:var(--bg);border-radius:14px;padding:8px 4px}
@@ -351,15 +353,17 @@ function vMeal(){
   const dd=day(D);let tl=0,tn=0;
   S.members.forEach(x=>{const a=dd.meals[x.id]||[0,0];tl+=+a[0]||0;tn+=+a[1]||0});
   const rows=S.members.map(x=>{const a=dd.meals[x.id]||[0,0],l=isLk(dd,x.id);
-    const cell=i=>`<div class="sg"><span>${i?'রাত':'দুপুর'}</span><div class="st"><button type="button" onclick="stp('${x.id}',${i},-1)" aria-label="কমান">−</button><b id="v-${x.id}-${i}">${bn(+a[i]||0)}</b><button type="button" onclick="stp('${x.id}',${i},1)" aria-label="বাড়ান">+</button></div></div>`;
+    const cell=i=>`<div class="sg"><span>${i?'রাত':'দুপুর'}</span><div class="st"><button type="button" onclick="stp('${x.id}',${i},-1)" aria-label="কমান">−</button><input class="sv" id="v-${x.id}-${i}" type="text" inputmode="decimal" autocomplete="off" value="${bn(+a[i]||0)}" onfocus="this.select()" onchange="setMeal('${x.id}',${i},this.value)" aria-label="${esc(x.name)} ${i?'রাত':'দুপুর'} মিল"><button type="button" onclick="stp('${x.id}',${i},1)" aria-label="বাড়ান">+</button></div></div>`;
     return `<div class="mc"><div class="mc-h"><b>${esc(x.name)}</b>${l?'<span class="ok">✓ সেভ হয়েছে</span>':''}</div><div class="mc-b">${cell(0)}${cell(1)}</div>${l?`<button class="btn alt" onclick="unlockMember('${x.id}')">সদস্যের জন্য আবার খুলে দিন</button>`:`<button class="btn" onclick="saveMember('${x.id}')">সেভ করুন</button>`}</div>`}).join('');
   return `<div class="card"><h2>${dl(D)} মিল</h2>${dpick()}
-  ${S.members.length?`<div class="sum"><div><b>${bn(tl)}</b><span>দুপুর</span></div><div><b>${bn(tn)}</b><span>রাত</span></div><div><b>${bn(tl+tn)}</b><span>মোট</span></div></div>${rows}`:'<p class="note">আগে “আরও → সদস্য” থেকে সদস্য যোগ করুন, বা সদস্যদের সাইন আপ করতে বলুন।</p>'}
-  <p class="note">ম্যানেজার হিসেবে আপনি সেভ হয়ে যাওয়া মিলও + / − দিয়ে বদলাতে পারবেন। সদস্য নিজে বদলাতে চাইলে “আবার খুলে দিন” চাপুন।</p></div>`;
+  ${S.members.length?`<div class="sum"><div><b id="sm-l">${bn(tl)}</b><span>দুপুর</span></div><div><b id="sm-n">${bn(tn)}</b><span>রাত</span></div><div><b id="sm-t">${bn(tl+tn)}</b><span>মোট</span></div></div>${rows}`:'<p class="note">আগে “আরও → সদস্য” থেকে সদস্য যোগ করুন, বা সদস্যদের সাইন আপ করতে বলুন।</p>'}
+  <p class="note">মিল + / − বাটন দিয়ে বাড়ানো-কমানো যাবে, অথবা সংখ্যার ঘরে চেপে সরাসরি লিখেও দিতে পারবেন। ম্যানেজার হিসেবে সেভ হয়ে যাওয়া মিলও বদলাতে পারবেন। সদস্য নিজে বদলাতে চাইলে “আবার খুলে দিন” চাপুন।</p></div>`;
 }
 function unlockMember(id){if(!isM())return;const dd=day(D);dd.locked=false;dd.lk=dd.lk||{};dd.lk[id]=false;save();render()}
-function stp(id,i,d){if(!isM())return;const dd=day(D);const a=(dd.meals[id]||[0,0]).slice();a[i]=Math.max(0,(+a[i]||0)+d);dd.meals[id]=a;save();const e=document.getElementById('v-'+id+'-'+i);if(e)e.textContent=bn(a[i])}
-function setMeal(id,i,v){if(!isM())return;if(isLk(day(D),id))return;const a=day(D).meals[id]||[0,0];a[i]=Math.max(0,+v||0);day(D).meals[id]=a;save()}
+const pn=v=>{const t=String(v).replace(/[০-৯]/g,d=>'০১২৩৪৫৬৭৮৯'.indexOf(d)).replace(/[,،]/g,'.').replace(/[^0-9.]/g,''),n=parseFloat(t);return isFinite(n)&&n>0?Math.round(n*100)/100:0};
+function updSum(){const dd=day(D);let tl=0,tn=0;S.members.forEach(x=>{const a=dd.meals[x.id]||[0,0];tl+=+a[0]||0;tn+=+a[1]||0});const set=(i,v)=>{const e=document.getElementById(i);if(e)e.textContent=bn(Math.round(v*100)/100)};set('sm-l',tl);set('sm-n',tn);set('sm-t',tl+tn)}
+function stp(id,i,d){if(!isM())return;const dd=day(D);const a=(dd.meals[id]||[0,0]).slice();a[i]=Math.max(0,Math.round(((+a[i]||0)+d)*100)/100);dd.meals[id]=a;save();const e=document.getElementById('v-'+id+'-'+i);if(e)e.value=bn(a[i]);updSum()}
+function setMeal(id,i,v){if(!isM())return;const dd=day(D),a=(dd.meals[id]||[0,0]).slice();a[i]=pn(v);dd.meals[id]=a;save();const e=document.getElementById('v-'+id+'-'+i);if(e)e.value=bn(a[i]);updSum()}
 function saveMember(id){if(!isM())return;if(confirm(mem(id).name+'-এর '+dmy(D)+' তারিখের মিল সেভ করবেন? সেভ করার পর আর পরিবর্তন করা যাবে না।')){const dd=day(D);dd.lk=dd.lk||{};dd.lk[id]=true;save();render()}}
 function vMenu(){
   const dd=day(D);
@@ -610,10 +614,10 @@ function logout(){role='';me='';prof=null;try{localStorage.removeItem('role');lo
 function vMy(){
   const dd=day(D),lk=isLk(dd,me),mine=S.members.find(x=>x.id===me);
   const a0=dd.meals[me]||[0,0];
-  const cell=i=>`<div class="sg"><span>${i?'রাত':'দুপুর'}</span>${lk?`<b class="big1">${bn(+a0[i]||0)}</b>`:`<div class="st"><button type="button" onclick="stpMe(${i},-1)" aria-label="কমান">−</button><b id="v-me-${i}">${bn(+a0[i]||0)}</b><button type="button" onclick="stpMe(${i},1)" aria-label="বাড়ান">+</button></div>`}</div>`;
+  const cell=i=>`<div class="sg"><span>${i?'রাত':'দুপুর'}</span>${lk?`<b class="big1">${bn(+a0[i]||0)}</b>`:`<div class="st"><button type="button" onclick="stpMe(${i},-1)" aria-label="কমান">−</button><input class="sv" id="v-me-${i}" type="text" inputmode="decimal" autocomplete="off" value="${bn(+a0[i]||0)}" onfocus="this.select()" onchange="myMeal(${i},this.value)" aria-label="${i?'রাত':'দুপুর'} মিল"><button type="button" onclick="stpMe(${i},1)" aria-label="বাড়ান">+</button></div>`}</div>`;
   const others=S.members.filter(x=>x.id!==me).map(x=>{const a=dd.meals[x.id]||[0,0];return `<div class="li"><div class="li-m"><b>${esc(x.name)}${isLk(dd,x.id)?' <span class="ok" style="font-size:13px">✓</span>':''}</b><span>দুপুর ${bn(+a[0]||0)} · রাত ${bn(+a[1]||0)}</span></div></div>`}).join('');
   return `<div class="card"><h2>${mine?esc(mine.name)+', আপনার':'আপনার'} মিল</h2>${dpick()}
-  ${lk?'<p class="ok">✓ আপনার এই দিনের মিল সেভ হয়েছে। বদলাতে চাইলে ম্যানেজারকে জানান।</p>':'<p class="note">দুপুর ও রাতের মিল + / − দিয়ে ঠিক করে “সেভ করুন” চাপুন। সেভ করার পর শুধু ম্যানেজার বদলাতে পারবেন।</p>'}
+  ${lk?'<p class="ok">✓ আপনার এই দিনের মিল সেভ হয়েছে। বদলাতে চাইলে ম্যানেজারকে জানান।</p>':'<p class="note">দুপুর ও রাতের মিল + / − দিয়ে বা সংখ্যার ঘরে সরাসরি লিখে ঠিক করে “সেভ করুন” চাপুন। সেভ করার পর শুধু ম্যানেজার বদলাতে পারবেন।</p>'}
   <div class="mc"><div class="mc-b">${cell(0)}${cell(1)}</div>${lk?'':'<button class="btn" style="width:100%" onclick="saveMine()">সেভ করুন</button>'}</div>${mgrName()?`<p class="note">মিল ম্যানেজার: ${mgrName()}</p>`:''}</div>
   <div class="card"><h2>অন্যদের মিল</h2>${others||'<div class="empty">আর কোনো সদস্য নেই</div>'}</div>
   <div class="card"><h2>${dl(D)} মেনু</h2><p>দুপুর: ${esc(dd.menu.l)||'—'}<br>রাত: ${esc(dd.menu.n)||'—'}</p></div>`;
@@ -626,8 +630,8 @@ function saveMine(){
   try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}
   render();
 }
-function stpMe(i,d){if(!me||isLk(day(D),me))return;const a=(day(D).meals[me]||[0,0]).slice();a[i]=Math.max(0,(+a[i]||0)+d);day(D).meals[me]=a;if(window.cloud)window.cloud.meal(D,me,a);const e=document.getElementById('v-me-'+i);if(e)e.textContent=bn(a[i])}
-function myMeal(i,v){if(!me||isLk(day(D),me))return;const a=(day(D).meals[me]||[0,0]).slice();a[i]=Math.max(0,+v||0);day(D).meals[me]=a;if(window.cloud)window.cloud.meal(D,me,a)}
+function stpMe(i,d){if(!me||isLk(day(D),me))return;const a=(day(D).meals[me]||[0,0]).slice();a[i]=Math.max(0,Math.round(((+a[i]||0)+d)*100)/100);day(D).meals[me]=a;if(window.cloud)window.cloud.meal(D,me,a);const e=document.getElementById('v-me-'+i);if(e)e.value=bn(a[i])}
+function myMeal(i,v){if(!me||isLk(day(D),me))return;const a=(day(D).meals[me]||[0,0]).slice();a[i]=pn(v);day(D).meals[me]=a;if(window.cloud)window.cloud.meal(D,me,a);const e=document.getElementById('v-me-'+i);if(e)e.value=bn(a[i])}
 const SW=[["গ্লাস থিম", [["glass12", "বরফ", "#3cbeff", "#e6f4ff"], ["glass1", "অরোরা", "#80d6ff", "#ff78aa"], ["glass4", "সূর্যাস্ত", "#ff9a5c", "#ff6f91"], ["glass20", "কালো", "#000000", "#4a4a55"]]]];
 const mgrName=()=>{const m=S.members.find(x=>x.id===S.managerId);return m?esc(m.name):''};
 function vMgr(){
@@ -644,10 +648,117 @@ function pickMgr(id){
   if(!confirm(mem(id).name+'-কে মিল ম্যানেজার করবেন? এরপর শুধু তিনিই সব এডিট করতে পারবেন, আপনি আর পারবেন না।'))return;
   S.managerId=id;save();render();
 }
+/* ---------- মাসিক এক্সপোর্ট (JPG) ---------- */
+const FNT='"Kalpurush","Hind Siliguri",sans-serif';
+async function fontsReady(){try{await Promise.all([document.fonts.load('20px "Kalpurush"'),document.fonts.load('700 20px "Kalpurush"')])}catch(e){}}
+async function saveJpg(cv,fname,text){
+  const b=await new Promise(res=>cv.toBlob(res,'image/jpeg',.92));
+  if(await nativeShare(b,fname,text))return;
+  const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=fname;a.click();
+}
+function fitTxt(g,t,w,px,bold){let p=px;do{g.font=(bold?'700 ':'400 ')+p+'px '+FNT;if(g.measureText(t).width<=w)break;p--}while(p>13);return p}
+function wrapTxt(g,t,w){
+  const out=[];let line='';
+  const push=x=>{out.push(x)};
+  for(const word of String(t).split(' ')){
+    let ww=word;
+    while(g.measureText(ww).width>w&&ww.length>1){let k=ww.length;while(k>1&&g.measureText(ww.slice(0,k)).width>w)k--;if(line){push(line);line=''}push(ww.slice(0,k));ww=ww.slice(k)}
+    const tt=line?line+' '+ww:ww;
+    if(g.measureText(tt).width>w&&line){push(line);line=ww}else line=tt;
+  }
+  if(line||!out.length)push(line);
+  return out;
+}
+async function expMeal(){
+  const mb=S.members;if(!mb.length){alert('কোনো সদস্য নেই');return}
+  const Y=+M.slice(0,4),Mo=+M.slice(5),nd=new Date(Y,Mo,0).getDate();
+  const tl={},tn={};mb.forEach(x=>{tl[x.id]=0;tn[x.id]=0});
+  const rows=[];let any=false;
+  for(let i=1;i<=nd;i++){
+    const d=M+'-'+String(i).padStart(2,'0'),dd=S.days[d],r={d,v:{}};
+    mb.forEach(x=>{const a=(dd&&dd.meals&&dd.meals[x.id])||[0,0],l=+a[0]||0,n=+a[1]||0;r.v[x.id]=[l,n];tl[x.id]+=l;tn[x.id]+=n;if(l||n)any=true});
+    rows.push(r);
+  }
+  if(!any){alert(mn(M)+' মাসে কোনো মিলের তথ্য নেই');return}
+  await fontsReady();
+  const PAD=28,CW=76,RH=38,n=mb.length,W=Math.max(780,PAD*2+230+n*2*CW),DC=W-PAD*2-n*2*CW;
+  const top=100,H=top+16+44+38+nd*RH+6+RH+RH+16+56+24;
+  const cv=document.createElement('canvas');cv.width=W;cv.height=H;const g=cv.getContext('2d');
+  iceBg(g,W,H);
+  g.fillStyle='#0b78d1';g.fillRect(0,0,W,top);
+  g.fillStyle='#fff';g.textAlign='left';g.font='700 32px '+FNT;g.fillText('মিল হিসাব — '+mn(M),PAD,50);
+  g.font='400 22px '+FNT;g.fillText('মোট সদস্য: '+bn(n)+' জন',PAD,82);
+  const ink='#14213d',lite='#9bb4c9',line='#b9d6ee',ac='#0b78d1';
+  const cx=i=>PAD+DC+i*2*CW; /* member group left */
+  let y=top+16;
+  /* header */
+  g.fillStyle='#cfe6f8';g.fillRect(PAD,y,W-PAD*2,44+38);
+  g.fillStyle=ac;g.textAlign='left';g.font='700 23px '+FNT;g.fillText('তারিখ',PAD+12,y+30);
+  g.textAlign='center';
+  mb.forEach((x,i)=>{const mw=2*CW-10;fitTxt(g,x.name,mw,23,1);g.fillStyle=ac;g.fillText(x.name,cx(i)+CW,y+30);g.font='700 19px '+FNT;g.fillText('দুপুর',cx(i)+CW/2,y+44+26);g.fillText('রাত',cx(i)+CW*1.5,y+44+26)});
+  y+=44+38;
+  /* rows */
+  rows.forEach((r,k)=>{
+    if(k%2===0){g.fillStyle='rgba(255,255,255,.55)';g.fillRect(PAD,y,W-PAD*2,RH)}
+    g.fillStyle=ink;g.textAlign='left';g.font='400 22px '+FNT;g.fillText(dm(r.d),PAD+12,y+26);
+    g.textAlign='right';g.fillStyle='#4f6b86';g.font='400 19px '+FNT;g.fillText(WD[new Date(r.d+'T00:00:00').getDay()],PAD+DC-14,y+26);
+    g.textAlign='center';g.font='400 23px '+FNT;
+    mb.forEach((x,i)=>{const v=r.v[x.id];[0,1].forEach(j=>{g.fillStyle=v[j]?ink:lite;g.fillText(bn(v[j]),cx(i)+CW*(j+.5),y+26)})});
+    y+=RH;
+  });
+  /* column separators */
+  g.fillStyle=line;
+  for(let i=0;i<=n;i++)g.fillRect(cx(i)-1,top+16+44,1.5,y-(top+16+44));
+  /* totals */
+  g.fillStyle=ac;g.fillRect(PAD,y+2,W-PAD*2,2);y+=6;
+  g.fillStyle=ink;g.textAlign='left';g.font='700 23px '+FNT;g.fillText('মোট মিল',PAD+12,y+26);
+  g.textAlign='center';mb.forEach((x,i)=>{g.fillText(bn(tl[x.id]),cx(i)+CW*.5,y+26);g.fillText(bn(tn[x.id]),cx(i)+CW*1.5,y+26)});
+  y+=RH;
+  g.fillStyle='rgba(255,255,255,.55)';g.fillRect(PAD,y,W-PAD*2,RH);
+  g.fillStyle=ink;g.textAlign='left';g.fillText('জনপ্রতি মোট',PAD+12,y+26);
+  g.textAlign='center';mb.forEach((x,i)=>g.fillText(bn(tl[x.id]+tn[x.id]),cx(i)+CW,y+26));
+  y+=RH+16;
+  const all=mb.reduce((t,x)=>t+tl[x.id]+tn[x.id],0);
+  g.fillStyle=ac;g.fillRect(0,y,W,56);g.fillStyle='#fff';g.textAlign='left';g.font='700 27px '+FNT;g.fillText('সর্বমোট মিল',PAD,y+37);g.textAlign='right';g.fillText(bn(all)+' টি',W-PAD,y+37);
+  await saveJpg(cv,'meal-report-'+M+'.jpg',mn(M)+' মাসের মিল হিসাব');
+}
+async function expBazar(){
+  const list=S.bazar.filter(b=>b.date.startsWith(M)).slice().sort((a,b)=>a.date.localeCompare(b.date));
+  if(!list.length){alert(mn(M)+' মাসে কোনো বাজার নেই');return}
+  await fontsReady();
+  const PAD=28,W=900,dW=170,bW=170,aW=140,iW=W-PAD*2-dW-bW-aW,x1=PAD+dW,x2=x1+iW,x3=x2+bW,LH=32;
+  const mc=document.createElement('canvas').getContext('2d');mc.font='400 23px '+FNT;
+  const items=list.map(b=>{const ls=wrapTxt(mc,b.item,iW-20);return {b,ls,h:Math.max(1,ls.length)*LH+14}});
+  const tot=list.reduce((t,b)=>t+b.amt,0),top=100,bodyH=items.reduce((t,r)=>t+r.h,0);
+  const H=top+16+46+bodyH+6+16+56+24;
+  const cv=document.createElement('canvas');cv.width=W;cv.height=H;const g=cv.getContext('2d');
+  iceBg(g,W,H);
+  g.fillStyle='#0b78d1';g.fillRect(0,0,W,top);
+  g.fillStyle='#fff';g.textAlign='left';g.font='700 32px '+FNT;g.fillText('বাজার হিসাব — '+mn(M),PAD,50);
+  g.font='400 22px '+FNT;g.fillText('মোট '+bn(list.length)+' বার বাজার',PAD,82);
+  const ink='#14213d',ac='#0b78d1';
+  let y=top+16;
+  g.fillStyle='#cfe6f8';g.fillRect(PAD,y,W-PAD*2,46);
+  g.fillStyle=ac;g.font='700 23px '+FNT;g.textAlign='left';g.fillText('তারিখ',PAD+12,y+31);g.fillText('কী কেনা হয়েছে',x1+12,y+31);g.fillText('কে করেছেন',x2+12,y+31);g.textAlign='right';g.fillText('টাকা',W-PAD-12,y+31);
+  y+=46;
+  items.forEach((r,k)=>{
+    if(k%2===0){g.fillStyle='rgba(255,255,255,.55)';g.fillRect(PAD,y,W-PAD*2,r.h)}
+    g.fillStyle=ink;g.textAlign='left';g.font='400 23px '+FNT;
+    g.fillText(dm(r.b.date),PAD+12,y+LH-4);
+    r.ls.forEach((t,i)=>g.fillText(t,x1+12,y+LH-4+i*LH));
+    const nm=mem(r.b.by).name;fitTxt(g,nm,bW-24,23);g.fillText(nm,x2+12,y+LH-4);
+    g.font='700 23px '+FNT;g.textAlign='right';g.fillText('৳'+f2(r.b.amt),W-PAD-12,y+LH-4);
+    y+=r.h;
+  });
+  g.fillStyle=ac;g.fillRect(PAD,y+2,W-PAD*2,2);y+=6+16;
+  g.fillStyle=ac;g.fillRect(0,y,W,56);g.fillStyle='#fff';g.textAlign='left';g.font='700 27px '+FNT;g.fillText('সর্বমোট বাজার',PAD,y+37);g.textAlign='right';g.fillText('৳'+f2(tot),W-PAD,y+37);
+  await saveJpg(cv,'bazar-report-'+M+'.jpg',mn(M)+' মাসের বাজার হিসাব');
+}
 function vMore(){
   const cur=document.documentElement.getAttribute('data-theme');
   return `<div class="card"><button class="lr" onclick="go('mgr')"><i>${ICON.mgr}</i><span>মিল ম্যানেজার সিলেক্ট করুন${mgrName()?`<small class="note" style="display:block">বর্তমান: ${mgrName()}</small>`:''}</span><em>›</em></button><button class="lr" onclick="go('mem')"><i>${ICON.users}</i><span>সদস্য ও ব্যাকআপ</span><em>›</em></button><button class="lr" onclick="go('cook')"><i>${ICON.cook}</i><span>রন্ধন শিল্পির তথ্য</span><em>›</em></button></div>
   <div class="card"><h2>থিম পরিবর্তন করুন</h2>${SW.map(g=>`<div class="sw">${g[1].map(t=>`<button class="swb ${cur===t[0]?'on':''}" onclick="setTheme('${t[0]}');render()" aria-label="${t[1]}"><span style="background:linear-gradient(135deg,${t[2]},${t[3]})"></span><small>${t[1]}</small></button>`).join('')}</div>`).join('')}</div>
+  <div class="card"><h2>এক্সপোর্ট দিন</h2>${monthPick()}<div class="row"><button class="btn" style="flex:1" onclick="expMeal()">মিল হিসাব</button><button class="btn alt" style="flex:1" onclick="expBazar()">বাজার হিসাব</button></div><p class="note">নির্বাচিত মাসের পুরো হিসাব একটি JPG ছবি হিসেবে সেভ হবে।</p></div>
   ${CLOUD&&role?`<div class="card"><button class="btn alt" style="width:100%" onclick="logout()">বের হন</button></div>`:''}`;
 }
 function render(){
