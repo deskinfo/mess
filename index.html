@@ -377,8 +377,8 @@ const nxt=m=>{const y=+m.slice(0,4),o=+m.slice(5);return o===12?(y+1)+'-01':y+'-
 const isRent=e=>/ভাড়া/.test(e.name||'');
 const isRifat=x=>/রিফাত|rifat|rifath/i.test(x.name||'');
 /* ---------- পরিচ্ছন্নতা ---------- */
-const CL_ROOMS=[{n:'রুম - ১',m:['আল আমিন','মমরেজ','সৈকত']},{n:'রুম - ২',m:['ইমদাদ','পলাশ','পিয়াস']}];
-const CL_WIN=[[1,3],[10,13],[20,23]],CL_FINE=200;
+const CL_ROOMS=[{n:'রুম - ১',m:['আল আমিন','মমরেজ','সৈকত']},{n:'রুম - ২',m:['পিয়াস','পলাশ','ইমদাদ']}];
+const CL_WIN=[[7,10],[17,20],[27,30]],CL_FINE=200;
 const cNm=x=>String(x||'').normalize('NFC').replace(/[\s\u200b-\u200d.\-_]/g,'').toLowerCase();
 /* বানান/কিবোর্ডের ছোটখাটো ভিন্নতা (য়/য, শ/স, ী/ি ইত্যাদি) এক ধরে নেওয়া */
 const cLoose=x=>cNm(x).replace(/\u09bc/g,'').replace(/[শষ]/g,'স').replace(/[ীঈ]/g,'ি').replace(/[ূঊ]/g,'ু').replace(/ণ/g,'ন').replace(/ৎ/g,'ত');
@@ -392,11 +392,11 @@ const clFind=nm=>{
   return null};
 const clRange=(w,m)=>bn(w[0])+'–'+bn(w[1])+' '+MN[+m.slice(5)-1];
 function clSlots(m){
-  const t=today(),out=[],pd=n=>String(n).padStart(2,'0');
+  const t=today(),out=[],pd=n=>String(n).padStart(2,'0'),dim=new Date(+m.slice(0,4),+m.slice(5,7),0).getDate();
   CL_ROOMS.forEach((R,ri)=>{
     const room=R.m.map(nm=>clFind(nm));
     R.m.forEach((nm,i)=>{
-      const w=CL_WIN[i],key='r'+(ri+1)+'-'+(i+1),st0=m+'-'+pd(w[0]),en=m+'-'+pd(w[1]);
+      const w=[CL_WIN[i][0],Math.min(CL_WIN[i][1],dim)],key='r'+(ri+1)+'-'+(i+1),st0=m+'-'+pd(w[0]),en=m+'-'+pd(w[1]);
       const mb=room[i],r=(S.cl&&S.cl[m]&&S.cl[m][key])||{};
       /* পুরনো রেকর্ড ({d,by}) ও নতুন ({sd,ap,mg}) দুটোই বোঝা হয় */
       const sd=r.sd||(r.by==='s'?r.d:''),mg=r.mg||(r.by==='m'?r.d:''),ap=r.ap||null,done=!!(mg||(sd&&ap));
