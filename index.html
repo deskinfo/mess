@@ -90,6 +90,15 @@ th{color:var(--mut);font-weight:500;font-size:14px}td.n,th.n{text-align:right}
 .cl-r.me{background:rgba(127,127,127,.08);margin:0 -8px;padding-left:8px;padding-right:8px;border-radius:12px}
 .cl-m{min-height:36px;padding:4px 12px;font-size:14px}
 @media (min-width:720px){.clw{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:start}}
+.hdbtn{min-height:36px;padding:4px 12px;color:inherit;background:rgba(255,255,255,.2);border-color:rgba(255,255,255,.45);white-space:nowrap}
+.pm-bg{position:fixed;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(0,0,0,.45);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
+.pm{width:100%;max-width:340px;background:#fff;color:#12302b;border-radius:20px;padding:20px;box-shadow:0 12px 40px rgba(0,0,0,.35)}
+.pm h3{margin:0 0 6px;font-size:19px}.pm p{margin:0 0 12px;font-size:14px;color:#4a5f5a}
+.pm input{width:100%;box-sizing:border-box;margin-bottom:10px;text-align:center;letter-spacing:8px;font-size:22px;padding:10px;border-radius:12px;border:1px solid #b9c9c5;background:#f4f8f7;color:#12302b}
+.pm input::placeholder{letter-spacing:0;font-size:14px}
+.pm .pm-e{color:#c0392b;min-height:18px;margin:0 0 8px;font-size:14px}
+.pm-b{display:flex;gap:10px}.pm-b .btn{flex:1}
+.pm-f{display:block;margin:12px auto 0;background:none;border:0;color:#0e6b5c;font:inherit;font-size:14px;text-decoration:underline;cursor:pointer}
 .big.lay{grid-template-columns:1.15fr 1fr 1fr;align-items:stretch}
 .big.lay .bt{grid-column:1;grid-row:1/3;display:flex;flex-direction:column;justify-content:center}
 .big.lay .bw{grid-column:1/-1}
@@ -344,9 +353,11 @@ function syncRole(){if(!CLOUD){role='manager';return}
   let sr='';try{sr=localStorage.getItem('role')||''}catch(e){}
   role=m?(S.managerId?(S.managerId===me?'manager':'member'):(sr==='manager'?'manager':'member')):'';
   if(role&&window.cloudReady){try{localStorage.setItem('role',role)}catch(e){}}}
-const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}if(CLOUD&&role==='manager'&&(!S.managerId||S.managerId===me)&&window.cloud&&window.cloudReady)window.cloud.push()};
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}if(CLOUD&&isM()&&(!S.managerId||S.managerId===me)&&window.cloud&&window.cloudReady)window.cloud.push()};
 const uid=()=>Math.random().toString(36).slice(2,8);
-const isM=()=>role==='manager';
+let asM=false;try{asM=localStorage.getItem('asm')==='1'}catch(e){}
+const realM=()=>role==='manager';
+const isM=()=>role==='manager'&&!asM;
 const mem=id=>S.members.find(m=>m.id===id)||{name:'?'};
 const day=d=>S.days[d]||(S.days[d]={menu:{l:'',n:''},meals:{}});
 const ICON={
@@ -620,6 +631,41 @@ function clUndo(key){
   if(!confirm(x.name+'-এর সব চিহ্ন (নিশ্চিত করা ও সম্মতি) তুলে নেবেন? সময় পার হয়ে গেলে জরিমানা আবার যোগ হবে।'))return;
   clSet(x,null,null)}
 
+/* ---------- ম্যানেজার / সদস্য মোড (পিন সহ) ---------- */
+const pinH=p=>cyrb('mpin|'+p);
+const pinNorm=v=>String(v||'').replace(/[০-৯]/g,d=>'০১২৩৪৫৬৭৮৯'.indexOf(d)).replace(/\D/g,'').slice(0,4);
+function pinClose(){const e=document.getElementById('pm');if(e)e.remove()}
+function pinAsk(o){
+  pinClose();
+  const d=document.createElement('div');d.id='pm';d.className='pm-bg';
+  d.innerHTML=`<div class="pm"><h3>${o.title}</h3><p>${o.desc||''}</p>
+  <input id="pm1" type="password" inputmode="numeric" autocomplete="off" maxlength="4" placeholder="৪ সংখ্যার পিন">
+  ${o.again?'<input id="pm2" type="password" inputmode="numeric" autocomplete="off" maxlength="4" placeholder="আবার একই পিন দিন">':''}
+  <p class="pm-e" id="pme"></p>
+  <div class="pm-b"><button class="btn alt" onclick="pinClose()">বাতিল</button><button class="btn" id="pmok">${o.ok}</button></div>
+  ${o.forgot?'<button class="pm-f" onclick="pinForgot()">পিন ভুলে গেছেন?</button>':''}</div>`;
+  document.body.appendChild(d);
+  const a=document.getElementById('pm1'),b=document.getElementById('pm2'),er=m=>{document.getElementById('pme').textContent=m};
+  const go=()=>{const x=pinNorm(a.value);
+    if(x.length!==4){er('৪ সংখ্যার পিন দিন');return}
+    if(o.again&&pinNorm(b.value)!==x){er('দুই জায়গায় পিন মেলেনি');return}
+    o.done(x,er)};
+  document.getElementById('pmok').onclick=go;
+  [a,b].forEach(e=>e&&e.addEventListener('keydown',ev=>{if(ev.key==='Enter')go()}));
+  setTimeout(()=>a.focus(),50)}
+function setMode(v){asM=v;try{if(v)localStorage.setItem('asm','1');else localStorage.removeItem('asm')}catch(e){}tab='meal';pinClose();render()}
+function toggleMode(){
+  if(!CLOUD||!realM())return;
+  let h='';try{h=localStorage.getItem('mpinh')||''}catch(e){}
+  if(!asM){
+    /* ম্যানেজার → সদস্য মোড: প্রথমবার পিন বানাতে হবে */
+    if(!h){pinAsk({title:'পিন তৈরি করুন',desc:'সদস্য মোড থেকে ম্যানেজার মোডে ফিরতে এই পিন লাগবে। ৪ সংখ্যার একটি পিন দিন।',again:true,ok:'পিন সেট করুন',done:x=>{try{localStorage.setItem('mpinh',pinH(x))}catch(e){}setMode(true)}});return}
+    setMode(true);return}
+  /* সদস্য → ম্যানেজার মোড: পিন লাগবে */
+  if(!h){setMode(false);return}
+  pinAsk({title:'ম্যানেজার মোডে ঢুকুন',desc:'আপনার পিন দিন।',ok:'ঢুকুন',forgot:true,done:(x,er)=>{if(pinH(x)===h)setMode(false);else{er('ভুল পিন, আবার চেষ্টা করুন');const e=document.getElementById('pm1');e.value='';e.focus()}}})}
+function pinForgot(){if(!confirm('এই ডিভাইস থেকে বের হয়ে আবার মোবাইল নম্বর দিয়ে লগইন করলে ম্যানেজার মোড ফিরে আসবে আর নতুন পিন বানাতে পারবেন। এখনই বের হবেন?'))return;pinClose();logout()}
+
 let needTo='',needTo2='';
 const nTos=n=>Array.isArray(n.tos)?n.tos:(n.to?[n.to]:[]);
 
@@ -851,7 +897,7 @@ async function doAuth(){
     render();
   }catch(e){alert('সমস্যা হয়েছে: '+e.message)}finally{authBusy=false}
 }
-function logout(){role='';me='';prof=null;try{localStorage.removeItem('role');localStorage.removeItem('me');localStorage.removeItem('mph');localStorage.removeItem('mprof')}catch(e){}render()}
+function logout(){role='';me='';prof=null;try{localStorage.removeItem('role');localStorage.removeItem('me');localStorage.removeItem('mph');localStorage.removeItem('mprof');localStorage.removeItem('asm');localStorage.removeItem('mpinh')}catch(e){}asM=false;render()}
 function vMy(){
   const dd=day(D),lk=isLk(dd,me),mine=S.members.find(x=>x.id===me);
   const a0=dd.meals[me]||[0,0];
@@ -880,11 +926,11 @@ function vMgr(){
   return `<div class="card"><h2>মিল ম্যানেজার সিলেক্ট করুন</h2>
   <p class="note">যাকে ম্যানেজার করবেন, তিনি সব কিছু এডিট করতে পারবেন: সেভ হয়ে যাওয়া মিল বদলানো বা খুলে দেওয়া, বাজার, জমা-খরচ, সদস্য, মেনু ও মাসিক হিসাব। বাকিরা সব কিছু দেখতে পারবেন, শুধু নিজের মিল দিয়ে সেভ করতে পারবেন। এডিট করা যাবে শুধু ম্যানেজারের ফোনের অ্যাপ থেকে।</p>
   ${CLOUD?'':'<p class="due">এই সুবিধা ক্লাউড (Firebase) চালু থাকলে কাজ করে, তখন সদস্যরা নিজের ফোনে সাইন আপ করে ঢুকবেন।</p>'}
-  ${S.members.map(x=>`<button class="lr" ${(CLOUD&&role==='manager'&&(!cur||cur===me))?'':'disabled'} onclick="pickMgr('${x.id}')"><i>${ICON.users}</i><span>${esc(x.name)}<small class="note" style="display:block">${esc(x.phone||'নম্বর নেই')}</small></span>${cur===x.id?'<em class="ok" style="font-size:14px;font-weight:700">ম্যানেজার ✓</em>':'<em>›</em>'}</button>`).join('')||'<div class="empty">আগে সদস্য যোগ করুন বা সাইন আপ করান</div>'}</div>`;
+  ${S.members.map(x=>`<button class="lr" ${(CLOUD&&isM()&&(!cur||cur===me))?'':'disabled'} onclick="pickMgr('${x.id}')"><i>${ICON.users}</i><span>${esc(x.name)}<small class="note" style="display:block">${esc(x.phone||'নম্বর নেই')}</small></span>${cur===x.id?'<em class="ok" style="font-size:14px;font-weight:700">ম্যানেজার ✓</em>':'<em>›</em>'}</button>`).join('')||'<div class="empty">আগে সদস্য যোগ করুন বা সাইন আপ করান</div>'}</div>`;
 }
 function pickMgr(id){
   // ম্যানেজার বদলাতে পারবেন শুধু বর্তমান ম্যানেজার
-  if(!CLOUD||role!=='manager'||(S.managerId&&S.managerId!==me)){alert('শুধু বর্তমান ম্যানেজারই ম্যানেজার বদলাতে পারবেন');return}
+  if(!CLOUD||!isM()||(S.managerId&&S.managerId!==me)){alert('শুধু বর্তমান ম্যানেজারই ম্যানেজার বদলাতে পারবেন');return}
   if(id===S.managerId)return;
   if(!confirm(mem(id).name+'-কে মিল ম্যানেজার করবেন? এরপর শুধু তিনিই সব এডিট করতে পারবেন, আপনি আর পারবেন না।'))return;
   S.managerId=id;save();render();
@@ -1005,13 +1051,13 @@ function vMore(){
 function render(){
   const known=!!(me&&S.members.find(x=>x.id===me));
   if(CLOUD&&!window.cloudReady&&!known&&!prof){document.getElementById('app').innerHTML='<div class="card">লোড হচ্ছে…</div>';return}
-  const sm=document.querySelector('header small');if(sm)sm.textContent=(CLOUD&&!window.cloudReady)?'সিঙ্ক হচ্ছে…':'মেস ম্যানেজার';
   syncRole();
-  const mgr=role==='manager';
+  const sm=document.querySelector('header small');if(sm)sm.textContent=(CLOUD&&!window.cloudReady)?'সিঙ্ক হচ্ছে…':(CLOUD&&realM()?(asM?'সদস্য মোড':'ম্যানেজার মোড'):'মেস ম্যানেজার');
+  const mgr=isM(),rm=CLOUD&&realM();
   if(role)renderNav();else nav.innerHTML='';
   document.body.classList.toggle('hasnav',!!role);
   document.getElementById('ttl').textContent=!role?'স্বাগতম':TTL[tab];
-  document.getElementById('hr').innerHTML=(CLOUD&&role&&!mgr)?'<button class="btn alt" style="min-height:36px;padding:4px 12px;color:inherit;background:rgba(255,255,255,.2);border-color:rgba(255,255,255,.45)" onclick="logout()">বের হন</button>':'';
+  document.getElementById('hr').innerHTML=rm?`<button class="btn alt hdbtn" onclick="toggleMode()">${asM?'🔒 ম্যানেজার মোড':'সদস্য মোড'}</button>`:(CLOUD&&role&&!mgr)?'<button class="btn alt" style="min-height:36px;padding:4px 12px;color:inherit;background:rgba(255,255,255,.2);border-color:rgba(255,255,255,.45)" onclick="logout()">বের হন</button>':'';
   const back=(tab==='mem'||tab==='cook'||tab==='mgr')?'<button class="back" onclick="go(\'more\')">‹ আরও</button>':'';
   document.getElementById('app').innerHTML=!role?vLogin():back+{meal:()=>mgr?vMeal()+vMenu()+vWam():vMy(),bazar:vBazar,acc:vAcc,bill:vBill,cm:vCm,cl:vClean,more:vMore,mgr:vMgr,mem:vMem,cook:vCook}[tab]();
 }
