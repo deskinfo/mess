@@ -385,6 +385,7 @@ const wa=(p,t)=>`https://wa.me/${phone(p)}?text=${encodeURIComponent(t)}`;
 const MN=['জানুয়ারি','ফেব্রুয়ারি','মার্চ','এপ্রিল','মে','জুন','জুলাই','আগস্ট','সেপ্টেম্বর','অক্টোবর','নভেম্বর','ডিসেম্বর'];
 const mn=m=>MN[+m.slice(5)-1]+' '+bn(m.slice(0,4));
 const nxt=m=>{const y=+m.slice(0,4),o=+m.slice(5);return o===12?(y+1)+'-01':y+'-'+String(o+1).padStart(2,'0')};
+const prv=m=>{const y=+m.slice(0,4),o=+m.slice(5);return o===1?(y-1)+'-12':y+'-'+String(o-1).padStart(2,'0')};
 const isRent=e=>/ভাড়া/.test(e.name||'');
 const isRifat=x=>/রিফাত|rifat|rifath/i.test(x.name||'');
 /* ---------- পরিচ্ছন্নতা ---------- */
@@ -733,30 +734,39 @@ function del(k,id){if(!isM()||k==='bazar')return;if(!confirm('মুছে ফ�
 
 let exK='x',depM='',bazM='';
 function vAcc(){
-  const dep=S.deposits.filter(d=>d.date.startsWith(M)),ex=S.extras.filter(e=>e.month===M);
-  const lst=k=>ex.filter(e=>(e.k==='n')===(k==='n')).map(e=>li(esc(e.name),'','৳'+f2(e.amt),'extras',e.id)).join('')||'<div class="empty">কিছু নেই</div>';
-  return `<div class="row"><label>বিগত মাস (যে মাসের হিসাব করছেন): <input type="month" value="${M}" onchange="M=this.value;render()"></label></div>
+  const dep=S.deposits.filter(d=>d.date.startsWith(M));
+  const R=M,P=prv(R),Nx=nxt(R); /* বাছা মাসই “চলতি”, তার আগেরটা “বিগত”, পরেরটা “আগামী” */
+  const lst=(m,k)=>S.extras.filter(e=>e.month===m&&(e.k==='n')===(k==='n')).map(e=>li(esc(e.name),'','৳'+f2(e.amt),'extras',e.id)).join('')||'<div class="empty">কিছু নেই</div>';
+  const legacy=S.extras.filter(e=>e.month===P&&e.k==='n');
+  return `<div class="row"><label>মাস বেছে নিন (যে মাসের হিসাব দেখছেন): <input type="month" value="${M}" onchange="M=this.value;render()"></label></div>
   <div class="card"><h2>${mn(M)} মাসে খাবার বাবদ জমা</h2>
   ${isM()?`<div class="row"><select id="dm" onchange="depM=this.value" style="flex:1">${S.members.map(x=>`<option value="${x.id}" ${depM===x.id?'selected':''}>${esc(x.name)}</option>`).join('')}</select><input id="da" type="number" inputmode="decimal" min="0" placeholder="টাকা" style="width:100px"></div>
   <div class="row">${dinp('dd',today())}<button class="btn" onclick="addDep()">জমা নিন</button></div>`:''}
   ${dep.map(d=>li(esc(mem(d.mid).name),dm(d.date),'৳'+f2(d.amt),'deposits',d.id)).join('')||'<div class="empty">কোনো জমা নেই</div>'}</div>
   <div class="card"><h2>${isM()?'খরচ যোগ করুন':'খরচ'}</h2>
-  ${isM()?`<div class="row"><select id="ek" onchange="exK=this.value" style="flex:1"><option value="x" ${exK==='x'?'selected':''}>বিগত মাস (${mn(M)}) — আনুষাঙ্গিক খরচ</option><option value="n" ${exK==='n'?'selected':''}>চলতি মাস (${mn(nxt(M))}) — বিল (ভাড়া, গ্যাস, নেট…)</option></select></div>
+  ${isM()?`<div class="row"><select id="ek" onchange="exK=this.value" style="flex:1"><option value="x" ${exK==='x'?'selected':''}>চলতি মাস (${mn(R)}) — আনুষাঙ্গিক খরচ</option><option value="n" ${exK==='n'?'selected':''}>আগামী মাস (${mn(Nx)}) — বিল (ভাড়া, গ্যাস, নেট…)</option><option value="p" ${exK==='p'?'selected':''}>বিগত মাসে যে খরচ যোগ হয়নি (${mn(P)})</option></select></div>
   <div class="row"><input id="en" list="el" placeholder="খরচের নাম" style="flex:1;min-width:130px"><datalist id="el"><option>বাসা ভাড়া<option>গ্যাস বিল<option>ইন্টারনেট বিল<option>পানি বিল<option>বুয়া বিল<option>বিদ্যুৎ বিল<option>ময়লা বিল<option>মেরামত<option>অন্যান্য</datalist><input id="ea" type="number" inputmode="decimal" min="0" placeholder="টাকা" style="width:100px"></div>
   <button class="btn" style="width:100%" onclick="addEx()">যোগ করুন</button>
   <p class="note">সব খরচ মোট সদস্য সংখ্যা দিয়ে সমান ভাগ হবে। শুধু বাসা ভাড়া (নামে “ভাড়া” থাকলে) রিফাত বাদে বাকি সবার মাঝে সমান ভাগ হবে।</p>`:''}
-  <div class="sh">বিগত মাস (${mn(M)}) — আনুষাঙ্গিক খরচ</div>${lst('x')}
-  <div class="sh">চলতি মাস (${mn(nxt(M))}) — বিল</div>${lst('n')}</div>`;
+  <div class="sh">চলতি মাস (${mn(R)}) — আনুষাঙ্গিক খরচ</div>${lst(R,'x')}
+  <div class="sh">আগামী মাস (${mn(Nx)}) — বিল</div>${lst(R,'n')}
+  <div class="sh">বিগত মাসে যে খরচ যোগ হয়নি (${mn(P)})</div>${lst(P,'x')}
+  ${legacy.length?`<div class="sh">চলতি মাস (${mn(R)}) — বিল (আগের মাসে যোগ করা)</div>${lst(P,'n')}`:''}</div>`;
 }
 function addDep(){if(!isM())return;const a=+bazarV('da');if(!a)return;S.deposits.push({id:uid(),mid:bazarV('dm'),amt:a,date:bazarV('dd')});save();render()}
-function addEx(){if(!isM())return;const a=+bazarV('ea');if(!a)return;S.extras.push({id:uid(),name:bazarV('en')||'খরচ',amt:a,month:M,k:bazarV('ek')});save();render()}
+function addEx(){
+  if(!isM())return;const a=+bazarV('ea');if(!a)return;
+  const k=bazarV('ek'),R=M;
+  /* চলতি মাসের আনুষাঙ্গিক → (চলতি, x); আগামী মাসের বিল → (চলতি, n); বিগত মাসের বাদ পড়া খরচ → (বিগত, x) */
+  const t=k==='p'?{month:prv(R),k:'x'}:k==='n'?{month:R,k:'n'}:{month:R,k:'x'};
+  S.extras.push({id:uid(),name:bazarV('en')||'খরচ',amt:a,month:t.month,k:t.k});exK=k;save();render()}
 
 const bOpen=new Set();
 const tgB=(id,o)=>{o?bOpen.add(id):bOpen.delete(id)};
 function vBill(){
   const c=calc(M),A=mn(M),B=mn(nxt(M)),nd=S.nd[M]||{};
   const kv=(a,b,cl)=>`<div class="kv"><span>${a}</span><b${cl?` class="${cl}"`:''}>${b}</b></div>`;
-  return `<div class="row"><label>বিগত মাস (যে মাসের হিসাব করছেন): <input type="month" value="${M}" onchange="M=this.value;render()"></label></div>
+  return `<div class="row"><label>মাস বেছে নিন (যে মাসের হিসাব দেখছেন): <input type="month" value="${M}" onchange="M=this.value;render()"></label></div>
   <div class="card"><h2>${A} মাসের হিসাব</h2><div class="big lay">
   <div class="bt"><p><span>মোট জমা</span><b>৳${f2(c.totalDep)}</b></p><p><span>মোট বাজার</span><b>৳${f2(c.bazar)}</b></p><p class="bt-r"><span>${c.remain<0?'ঘাটতি (বাজার বেশি)':'অবশিষ্ট টাকা'}</span><b${c.remain<0?' class="due"':''}>${c.remain<0?'−':''}৳${f2(Math.abs(c.remain))}</b></p></div>
   <div><b>৳${f2(c.rentOn?c.othT(c.xs)/c.n:c.xT/c.n)}</b><span>আনুষাঙ্গিক খরচ, জনপ্রতি${c.rentOn&&c.rentT(c.xs)?' (ভাড়া বাদে)':''} (মোট ৳${f2(c.xT)})</span></div>
