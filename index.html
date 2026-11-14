@@ -359,7 +359,7 @@ let asM=false;try{asM=localStorage.getItem('asm')==='1'}catch(e){}
 const realM=()=>role==='manager';
 const isM=()=>role==='manager'&&!asM;
 const mem=id=>S.members.find(m=>m.id===id)||{name:'?'};
-const day=d=>S.days[d]||(S.days[d]={menu:{l:'',n:''},meals:{}});
+const day=d=>{const x=S.days[d]||(S.days[d]={});x.menu=x.menu||{l:'',n:''};x.meals=x.meals||{};return x};
 const ICON={
 meal:'<svg viewBox="0 0 24 24"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/></svg>',
 bazar:'<svg viewBox="0 0 24 24"><path d="m5 11 4-7"/><path d="m19 11-4-7"/><path d="M2 11h20"/><path d="m3.5 11 1.6 7.4a2 2 0 0 0 2 1.6h9.8c.9 0 1.8-.7 2-1.6l1.7-7.4"/><path d="m9 11 1 9"/><path d="m15 11-1 9"/></svg>',
@@ -468,8 +468,13 @@ function vMenu(){
   ${dd.menuSaved?`<p>দুপুর: ${esc(dd.menu.l)||'—'}<br>রাত: ${esc(dd.menu.n)||'—'}</p><button class="btn alt" onclick="editMenu()">এডিট করুন</button>`
   :`<div class="row"><input id="ml" placeholder="দুপুরের মেনু" style="flex:1" value="${esc(dd.menu.l)}"></div><div class="row"><input id="mnn" placeholder="রাতের মেনু" style="flex:1" value="${esc(dd.menu.n)}"></div><button class="btn" onclick="saveMenu()">সেভ করুন</button>`}</div>`;
 }
-function saveMenu(){if(!isM())return;const dd=day(D);dd.menu.l=bazarV('ml');dd.menu.n=bazarV('mnn');dd.menuSaved=true;save();render()}
-function editMenu(){if(!isM())return;day(D).menuSaved=false;save();render()}
+function menuPut(dd,saved){
+  dd.menuSaved=saved;
+  try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}
+  if(CLOUD&&window.cloud&&window.cloud.menu)window.cloud.menu(D,dd.menu.l,dd.menu.n,saved);else save();
+  render()}
+function saveMenu(){if(!role)return;const dd=day(D);dd.menu.l=bazarV('ml');dd.menu.n=bazarV('mnn');menuPut(dd,true)}
+function editMenu(){if(!role)return;menuPut(day(D),false)}
 function vWam(){
   const dd=day(D),pend=S.members.filter(x=>!isLk(dd,x.id)).length;
   return `<div class="card"><h2>হোয়াটস্যাপে পাঠান</h2>
@@ -673,33 +678,38 @@ function vNeeds(){
   const all=Object.values(S.needs||{}).sort((a,b)=>(!!a.done-!!b.done)||(b.t||0)-(a.t||0));
   const left=all.filter(n=>!n.done).length;
   const row=n=>{
-    const tos=nTos(n),mine=!!me&&tos.includes(me),can=isM()||mine;
+    const tos=nTos(n),mine=!!me&&tos.includes(me),can=!!role;
     return `<div class="nd-i${n.done?' dn':''}"><div class="li-m"><b>${esc(n.item)}${n.qty?` <small>— ${esc(n.qty)}</small>`:''}</b>
     <span>দায়িত্বে: ${tos.map(i=>esc(mem(i).name)).join(' ও ')}${mine&&!n.done?' <em class="nd-me">আপনি</em>':''}${n.done?' · <span class="ok">কেনা হয়েছে</span>':''}</span></div>
-    <div class="nd-a">${can?`<button class="btn alt nd-b" onclick="togNeed('${n.id}')">${n.done?'আবার বাকি':'কেনা হয়েছে'}</button>`:''}${isM()?`<button class="x" aria-label="মুছুন" onclick="delNeed('${n.id}')">×</button>`:''}</div></div>`};
-  const sel=needTo||(S.members[0]&&S.members[0].id)||'';
+    <div class="nd-a">${can?`<button class="btn alt nd-b" onclick="togNeed('${n.id}')">${n.done?'আবার বাকি':'কেনা হয়েছে'}</button>`:''}<button class="x" aria-label="মুছুন" onclick="delNeed('${n.id}')">×</button></div></div>`};
+  const sel=needTo||(me&&S.members.some(x=>x.id===me)?me:'')||(S.members[0]&&S.members[0].id)||'';
   return `<div class="card"><h2>বাসায় কি কি লাগবে?${all.length?` <small style="font-weight:400">— বাকি ${bn(left)}টি</small>`:''}</h2>
-  ${isM()?`<div class="row"><input id="ni" placeholder="কী লাগবে (যেমন: চাল, তেল)" style="flex:1;min-width:140px"><input id="nq" placeholder="পরিমাণ (ঐচ্ছিক)" style="width:130px"></div>
+  ${`<div class="row"><input id="ni" placeholder="কী লাগবে (যেমন: চাল, তেল)" style="flex:1;min-width:140px"><input id="nq" placeholder="পরিমাণ (ঐচ্ছিক)" style="width:130px"></div>
   <div class="row"><label class="nd-l">১ম দায়িত্বপ্রাপ্ত<select id="nt" onchange="needTo=this.value" style="width:100%">${S.members.map(x=>`<option value="${x.id}" ${sel===x.id?'selected':''}>${esc(x.name)}</option>`).join('')}</select></label>
   <label class="nd-l">২য় দায়িত্বপ্রাপ্ত (ঐচ্ছিক)<select id="nt2" onchange="needTo2=this.value" style="width:100%"><option value="">— কেউ নেই —</option>${S.members.map(x=>`<option value="${x.id}" ${needTo2===x.id?'selected':''}>${esc(x.name)}</option>`).join('')}</select></label></div>
   <div class="row"><button class="btn" style="width:100%" onclick="addNeed()">যোগ করুন</button></div>
-  <p class="note">এক বা দুইজনকে দায়িত্ব দিতে পারবেন, তাঁরা গিয়ে জিনিসগুলো কিনে আনবেন। কেনা হলে তাঁদের যেকোনো একজন (বা ম্যানেজার) “কেনা হয়েছে” চাপবেন।</p>`:''}
+  <p class="note">যে কেউ এখানে লিখতে পারবেন। এক বা দুইজনকে দায়িত্ব দিন, তাঁরা গিয়ে জিনিসগুলো কিনে আনবেন। কেনা হলে যে কেউ “কেনা হয়েছে” চাপতে পারবেন।</p>`}
   ${all.map(row).join('')||'<div class="empty">এখন কিছু লাগবে না</div>'}</div>`;
 }
 function addNeed(){
-  if(!isM())return;const item=bazarV('ni').trim(),to=bazarV('nt'),to2=bazarV('nt2');
+  if(!role)return;const item=bazarV('ni').trim(),to=bazarV('nt'),to2=bazarV('nt2');
   if(!item){alert('কী লাগবে লিখুন');return}
   if(!to){alert('অন্তত একজন দায়িত্বপ্রাপ্ত ব্যক্তি বেছে নিন');return}
   if(to2&&to2===to){alert('একই ব্যক্তিকে দুইবার দেওয়া যাবে না');return}
-  const id=uid();S.needs=S.needs||{};S.needs[id]={id,item,qty:bazarV('nq').trim(),tos:to2?[to,to2]:[to],done:false,t:Date.now()};
-  needTo2='';save();render()}
+  const id=uid();S.needs=S.needs||{};const e=S.needs[id]={id,item,qty:bazarV('nq').trim(),tos:to2?[to,to2]:[to],done:false,t:Date.now()};
+  needTo2='';try{localStorage.setItem(KEY,JSON.stringify(S))}catch(x){}
+  if(CLOUD&&window.cloud&&window.cloud.needAdd)window.cloud.needAdd(id,e);else save();
+  render()}
 function togNeed(id){
-  const n=S.needs&&S.needs[id];if(!n)return;if(!(isM()||(me&&nTos(n).includes(me))))return;
+  const n=S.needs&&S.needs[id];if(!n)return;if(!role)return;
   n.done=!n.done;n.doneBy=n.done?me:'';
   try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}
   if(CLOUD&&window.cloud&&window.cloud.need)window.cloud.need(id,n.done,n.doneBy);else save();
   render()}
-function delNeed(id){if(!isM())return;if(!confirm('তালিকা থেকে মুছে ফেলবেন?'))return;delete S.needs[id];save();render()}
+function delNeed(id){if(!role)return;if(!confirm('তালিকা থেকে মুছে ফেলবেন?'))return;delete S.needs[id];
+  try{localStorage.setItem(KEY,JSON.stringify(S))}catch(x){}
+  if(CLOUD&&window.cloud&&window.cloud.needDel)window.cloud.needDel(id);else save();
+  render()}
 
 function vBazar(){
   const list=S.bazar.filter(b=>b.date.startsWith(M)).sort((a,b)=>b.date.localeCompare(a.date));
@@ -907,7 +917,7 @@ function vMy(){
   ${lk?'<p class="ok">✓ আপনার এই দিনের মিল সেভ হয়েছে। বদলাতে চাইলে ম্যানেজারকে জানান।</p>':'<p class="note">দুপুর ও রাতের মিল + / − দিয়ে বা সংখ্যার ঘরে সরাসরি লিখে ঠিক করে “সেভ করুন” চাপুন। সেভ করার পর শুধু ম্যানেজার বদলাতে পারবেন।</p>'}
   <div class="mc"><div class="mc-b">${cell(0)}${cell(1)}</div>${lk?'':'<button class="btn" style="width:100%" onclick="saveMine()">সেভ করুন</button>'}</div>${mgrName()?`<p class="note">মিল ম্যানেজার: ${mgrName()}</p>`:''}</div>
   <div class="card"><h2>অন্যদের মিল</h2>${others||'<div class="empty">আর কোনো সদস্য নেই</div>'}</div>
-  <div class="card"><h2>${dl(D)} মেনু</h2><p>দুপুর: ${esc(dd.menu.l)||'—'}<br>রাত: ${esc(dd.menu.n)||'—'}</p></div>`;
+  `+vMenu()+vWam();
 }
 function saveMine(){
   if(!me||isLk(day(D),me))return;
@@ -1077,6 +1087,9 @@ if(window.FB&&FB.apiKey){
       meal(d,id,a){F.updateDoc(ref,new F.FieldPath('days',d,'meals',id),a).catch(e=>alert('সেভ হয়নি: '+e.message))},
       cl(m,key,f,v){F.updateDoc(ref,f?new F.FieldPath('cl',m,key,f):new F.FieldPath('cl',m,key),v===null?F.deleteField():v).catch(x=>alert('সেভ হয়নি: '+x.message))},
       cm(id,e,tks){const a=[ref,new F.FieldPath('cm',id),e];tks.forEach(t=>a.push(new F.FieldPath('cmu',t),true));F.updateDoc(...a).catch(x=>alert('সেভ হয়নি: '+x.message))},
+      menu(d,l,n,saved){F.updateDoc(ref,new F.FieldPath('days',d,'menu','l'),l,new F.FieldPath('days',d,'menu','n'),n,new F.FieldPath('days',d,'menuSaved'),saved).catch(e=>alert('সেভ হয়নি: '+e.message))},
+      needAdd(id,e){F.updateDoc(ref,new F.FieldPath('needs',id),e).catch(x=>alert('সেভ হয়নি: '+x.message))},
+      needDel(id){F.updateDoc(ref,new F.FieldPath('needs',id),F.deleteField()).catch(x=>alert('সেভ হয়নি: '+x.message))},
       need(id,done,by){F.updateDoc(ref,new F.FieldPath('needs',id,'done'),done,new F.FieldPath('needs',id,'doneBy'),by||'').catch(x=>alert('সেভ হয়নি: '+x.message))},
       bazar(e){F.updateDoc(ref,'bazar',F.arrayUnion(e)).catch(x=>alert('সেভ হয়নি: '+x.message))},
       lock(d,id,a){F.updateDoc(ref,new F.FieldPath('days',d,'meals',id),a,new F.FieldPath('days',d,'lk',id),true).catch(e=>alert('সেভ হয়নি: '+e.message))},
