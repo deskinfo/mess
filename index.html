@@ -1136,13 +1136,14 @@ if(window.FB&&FB.apiKey){
     const F=await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js');
     const app=A.initializeApp(FB),db=F.getFirestore(app),ref=F.doc(db,'mess','main'),pref=F.doc(db,'mess','push');
     let pending=false;
+    const pingW=()=>{try{fetch('https://mess-notify.bidrohibaangali.workers.dev/ping',{mode:'no-cors',keepalive:true}).catch(()=>{})}catch(e){}};
     window.cloud={
       push(){F.setDoc(ref,JSON.parse(JSON.stringify(S))).catch(e=>alert('সেভ হয়নি: '+e.message))},
       meal(d,id,a){F.updateDoc(ref,new F.FieldPath('days',d,'meals',id),a).catch(e=>alert('সেভ হয়নি: '+e.message))},
       cl(m,key,f,v){F.updateDoc(ref,f?new F.FieldPath('cl',m,key,f):new F.FieldPath('cl',m,key),v===null?F.deleteField():v).catch(x=>alert('সেভ হয়নি: '+x.message))},
-      cm(id,e,tks){const a=[ref,new F.FieldPath('cm',id),e];tks.forEach(t=>a.push(new F.FieldPath('cmu',t),true));F.updateDoc(...a).catch(x=>alert('সেভ হয়নি: '+x.message))},
+      cm(id,e,tks){const a=[ref,new F.FieldPath('cm',id),e];tks.forEach(t=>a.push(new F.FieldPath('cmu',t),true));F.updateDoc(...a).then(pingW).catch(x=>alert('সেভ হয়নি: '+x.message))},
       menu(d,l,n,saved){F.updateDoc(ref,new F.FieldPath('days',d,'menu','l'),l,new F.FieldPath('days',d,'menu','n'),n,new F.FieldPath('days',d,'menuSaved'),saved).catch(e=>alert('সেভ হয়নি: '+e.message))},
-      needAdd(id,e){F.updateDoc(ref,new F.FieldPath('needs',id),e).catch(x=>alert('সেভ হয়নি: '+x.message))},
+      needAdd(id,e){F.updateDoc(ref,new F.FieldPath('needs',id),e).then(pingW).catch(x=>alert('সেভ হয়নি: '+x.message))},
       needDel(id){F.updateDoc(ref,new F.FieldPath('needs',id),F.deleteField()).catch(x=>alert('সেভ হয়নি: '+x.message))},
       async pushNote(on){
         const mid=me;
