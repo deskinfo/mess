@@ -1086,6 +1086,24 @@ function vPush(){
   }[st];
   return `<div class="card"><h2>${M[0]}</h2><p class="note" style="margin:0 0 ${M[2]?10:0}px">${M[1]}</p>${M[2]?`<button class="btn${st==='on'?' alt':''}" style="width:100%" ${pushBusy?'disabled':''} onclick="pushToggle()">${pushBusy?'অপেক্ষা করুন…':M[2]}</button>`:''}</div>`}
 const pushBanner=()=>pushState()==='off'?vPush():'';
+/* লগইনের পর প্রথম ট্যাপে একবার নিজে থেকে নোটিফিকেশনের অনুমতি চায় (ব্রাউজার ট্যাপ ছাড়া অনুমতি চাইতে দেয় না) */
+let pushAuto=false;
+function pushAutoAsk(){
+  if(pushAuto||pushBusy)return;
+  if(!CLOUD||!role||!me||!window.cloud||!window.cloud.pushNote)return;
+  if(pushState()!=='off')return;
+  let asked='';try{asked=localStorage.getItem('pushAsked')}catch(e){}
+  if(Notification.permission==='default'&&asked==='1')return;
+  pushAuto=true;
+  try{localStorage.setItem('pushAsked','1')}catch(e){}
+  const ask=Notification.permission==='granted'?Promise.resolve('granted'):Notification.requestPermission();
+  Promise.resolve(ask).then(r=>{
+    if(r!=='granted'){render();return}
+    pushBusy=true;render();
+    return window.cloud.pushNote(true).catch(()=>{}).then(()=>{pushBusy=false;render()});
+  }).catch(()=>{pushBusy=false;render()});
+}
+document.addEventListener('click',pushAutoAsk,true);
 
 function vMore(){
   const cur=document.documentElement.getAttribute('data-theme');
