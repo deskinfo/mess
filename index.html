@@ -917,7 +917,7 @@ async function doAuth(){
     render();
   }catch(e){alert('সমস্যা হয়েছে: '+e.message)}finally{authBusy=false}
 }
-function logout(){role='';me='';prof=null;try{localStorage.removeItem('role');localStorage.removeItem('me');localStorage.removeItem('mph');localStorage.removeItem('mprof');localStorage.removeItem('asm');localStorage.removeItem('mpinh')}catch(e){}asM=false;render()}
+function logout(){try{if(window.cloud&&window.cloud.pushNote&&localStorage.getItem('pushOn')==='1')window.cloud.pushNote(false).catch(()=>{})}catch(e){}role='';me='';prof=null;try{localStorage.removeItem('role');localStorage.removeItem('me');localStorage.removeItem('mph');localStorage.removeItem('mprof');localStorage.removeItem('asm');localStorage.removeItem('mpinh')}catch(e){}asM=false;render()}
 function vMy(){
   const dd=day(D),lk=isLk(dd,me),mine=S.members.find(x=>x.id===me);
   const a0=dd.meals[me]||[0,0];
@@ -1061,9 +1061,35 @@ async function expBazar(){
   g.fillStyle=ac;g.fillRect(0,y,W,56);g.fillStyle='#fff';g.textAlign='left';g.font='700 27px '+FNT;g.fillText('সর্বমোট বাজার',PAD,y+37);g.textAlign='right';g.fillText('৳'+f2(tot),W-PAD,y+37);
   await saveJpg(cv,'bazar-report-'+M+'.jpg',mn(M)+' মাসের বাজার হিসাব');
 }
+/* ---------- নোটিফিকেশন ---------- */
+function pushState(){
+  if(!(window.FB&&FB.apiKey)||!('Notification' in window)||!('serviceWorker' in navigator)||!('PushManager' in window))return 'na';
+  if(!FB.vapidKey)return 'nokey';
+  if(Notification.permission==='denied')return 'denied';
+  let on='';try{on=localStorage.getItem('pushOn')}catch(e){}
+  return on==='1'&&Notification.permission==='granted'?'on':'off'}
+let pushBusy=false;
+async function pushToggle(){
+  if(pushBusy||!window.cloud||!window.cloud.pushNote)return;
+  pushBusy=true;render();
+  try{await window.cloud.pushNote(pushState()!=='on')}catch(e){alert(e.message||'নোটিফিকেশন চালু করা যায়নি')}
+  pushBusy=false;render()}
+function vPush(){
+  if(!CLOUD||!role||!me)return '';
+  const st=pushState();
+  if(st==='nokey')return isM()?`<div class="card"><h2>নোটিফিকেশন</h2><p class="note" style="margin:0">এখনো সেটআপ হয়নি। config.js ফাইলে vapidKey যোগ করতে হবে।</p></div>`:'';
+  const M={
+    on:['নোটিফিকেশন চালু আছে ✓','বাজারের দায়িত্ব, কমিউনিটির মেসেজ, মিল ও পরিচ্ছন্নতার রিমাইন্ডার এই ফোনে আসবে।','বন্ধ করুন'],
+    off:['নোটিফিকেশন চালু করুন','বাজারের দায়িত্ব, মিল আপডেট, পরিচ্ছন্নতা আর কমিউনিটির খবর ফোনে পেতে চালু করুন।','চালু করুন'],
+    denied:['নোটিফিকেশন বন্ধ করা আছে','ফোন বা ব্রাউজারের সেটিংসে এই সাইটের নোটিফিকেশন অনুমতি দিন, তারপর আবার চেষ্টা করুন।',''],
+    na:['নোটিফিকেশন পাওয়া যাবে না','এই ডিভাইস বা ব্রাউজারে নোটিফিকেশন সাপোর্ট নেই। iPhone হলে সাইটটি হোম স্ক্রিনে যোগ করে সেখান থেকে খুলুন।','']
+  }[st];
+  return `<div class="card"><h2>${M[0]}</h2><p class="note" style="margin:0 0 ${M[2]?10:0}px">${M[1]}</p>${M[2]?`<button class="btn${st==='on'?' alt':''}" style="width:100%" ${pushBusy?'disabled':''} onclick="pushToggle()">${pushBusy?'অপেক্ষা করুন…':M[2]}</button>`:''}</div>`}
+const pushBanner=()=>pushState()==='off'?vPush():'';
+
 function vMore(){
   const cur=document.documentElement.getAttribute('data-theme');
-  return `<div class="card"><button class="lr" onclick="go('mgr')"><i>${ICON.mgr}</i><span>মিল ম্যানেজার সিলেক্ট করুন${mgrName()?`<small class="note" style="display:block">বর্তমান: ${mgrName()}</small>`:''}</span><em>›</em></button><button class="lr" onclick="go('mem')"><i>${ICON.users}</i><span>সদস্য ও ব্যাকআপ</span><em>›</em></button><button class="lr" onclick="go('cook')"><i>${ICON.cook}</i><span>রন্ধন শিল্পির তথ্য</span><em>›</em></button></div>
+  return vPush()+`<div class="card"><button class="lr" onclick="go('mgr')"><i>${ICON.mgr}</i><span>মিল ম্যানেজার সিলেক্ট করুন${mgrName()?`<small class="note" style="display:block">বর্তমান: ${mgrName()}</small>`:''}</span><em>›</em></button><button class="lr" onclick="go('mem')"><i>${ICON.users}</i><span>সদস্য ও ব্যাকআপ</span><em>›</em></button><button class="lr" onclick="go('cook')"><i>${ICON.cook}</i><span>রন্ধন শিল্পির তথ্য</span><em>›</em></button></div>
   <div class="card"><h2>থিম পরিবর্তন করুন</h2>${SW.map(g=>`<div class="sw">${g[1].map(t=>`<button class="swb ${cur===t[0]?'on':''}" onclick="setTheme('${t[0]}');render()" aria-label="${t[1]}"><span style="background:linear-gradient(135deg,${t[2]},${t[3]})"></span><small>${t[1]}</small></button>`).join('')}</div>`).join('')}</div>
   <div class="card"><h2>এক্সপোর্ট দিন</h2>${monthPick()}<div class="row"><button class="btn" style="flex:1" onclick="expMeal()">মিল হিসাব</button><button class="btn alt" style="flex:1" onclick="expBazar()">বাজার হিসাব</button></div><p class="note">নির্বাচিত মাসের পুরো হিসাব একটি JPG ছবি হিসেবে সেভ হবে।</p></div>
   ${CLOUD&&role?`<div class="card"><button class="btn alt" style="width:100%" onclick="logout()">বের হন</button></div>`:''}`;
@@ -1079,7 +1105,7 @@ function render(){
   document.getElementById('ttl').textContent=!role?'স্বাগতম':TTL[tab];
   document.getElementById('hr').innerHTML=rm?`<button class="btn alt hdbtn" onclick="toggleMode()">${asM?'🔒 ম্যানেজার মোড':'সদস্য মোড'}</button>`:(CLOUD&&role&&!mgr)?'<button class="btn alt" style="min-height:36px;padding:4px 12px;color:inherit;background:rgba(255,255,255,.2);border-color:rgba(255,255,255,.45)" onclick="logout()">বের হন</button>':'';
   const back=(tab==='mem'||tab==='cook'||tab==='mgr')?'<button class="back" onclick="go(\'more\')">‹ আরও</button>':'';
-  document.getElementById('app').innerHTML=!role?vLogin():back+{meal:()=>mgr?vMeal()+vMenu()+vWam():vMy(),bazar:vBazar,acc:vAcc,bill:vBill,cm:vCm,cl:vClean,more:vMore,mgr:vMgr,mem:vMem,cook:vCook}[tab]();
+  document.getElementById('app').innerHTML=!role?vLogin():back+{meal:()=>pushBanner()+(mgr?vMeal()+vMenu()+vWam():vMy()),bazar:vBazar,acc:vAcc,bill:vBill,cm:vCm,cl:vClean,more:vMore,mgr:vMgr,mem:vMem,cook:vCook}[tab]();
 }
 if(navigator.storage&&navigator.storage.persist)navigator.storage.persist().catch(()=>{});
 if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
@@ -1090,7 +1116,7 @@ if(window.FB&&FB.apiKey){
   try{
     const A=await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js');
     const F=await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js');
-    const db=F.getFirestore(A.initializeApp(FB)),ref=F.doc(db,'mess','main');
+    const app=A.initializeApp(FB),db=F.getFirestore(app),ref=F.doc(db,'mess','main'),pref=F.doc(db,'mess','push');
     let pending=false;
     window.cloud={
       push(){F.setDoc(ref,JSON.parse(JSON.stringify(S))).catch(e=>alert('সেভ হয়নি: '+e.message))},
@@ -1100,6 +1126,27 @@ if(window.FB&&FB.apiKey){
       menu(d,l,n,saved){F.updateDoc(ref,new F.FieldPath('days',d,'menu','l'),l,new F.FieldPath('days',d,'menu','n'),n,new F.FieldPath('days',d,'menuSaved'),saved).catch(e=>alert('সেভ হয়নি: '+e.message))},
       needAdd(id,e){F.updateDoc(ref,new F.FieldPath('needs',id),e).catch(x=>alert('সেভ হয়নি: '+x.message))},
       needDel(id){F.updateDoc(ref,new F.FieldPath('needs',id),F.deleteField()).catch(x=>alert('সেভ হয়নি: '+x.message))},
+      async pushNote(on){
+        const mid=me;
+        if(!mid)throw new Error('আগে লগইন করুন');
+        const Mg=await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-messaging.js');
+        if(!(await Mg.isSupported()))throw new Error('এই ডিভাইসে নোটিফিকেশন সাপোর্ট নেই');
+        const msg=Mg.getMessaging(app);
+        if(on){
+          if(!FB.vapidKey)throw new Error('config.js-এ vapidKey নেই');
+          if(Notification.permission!=='granted'&&(await Notification.requestPermission())!=='granted')throw new Error('নোটিফিকেশনের অনুমতি দেওয়া হয়নি');
+          const reg=await navigator.serviceWorker.ready;
+          const tok=await Mg.getToken(msg,{vapidKey:FB.vapidKey,serviceWorkerRegistration:reg});
+          if(!tok)throw new Error('নোটিফিকেশন টোকেন পাওয়া যায়নি');
+          await F.setDoc(pref,{tokens:{[mid]:F.arrayUnion(tok)}},{merge:true});
+          try{localStorage.setItem('pushOn','1');localStorage.setItem('pushTok',tok)}catch(e){}
+        }else{
+          let tok='';try{tok=localStorage.getItem('pushTok')||''}catch(e){}
+          if(tok)await F.setDoc(pref,{tokens:{[mid]:F.arrayRemove(tok)}},{merge:true});
+          try{await Mg.deleteToken(msg)}catch(e){}
+          try{localStorage.removeItem('pushOn');localStorage.removeItem('pushTok')}catch(e){}
+        }
+      },
       need(id,done,by){F.updateDoc(ref,new F.FieldPath('needs',id,'done'),done,new F.FieldPath('needs',id,'doneBy'),by||'').catch(x=>alert('সেভ হয়নি: '+x.message))},
       bazar(e){F.updateDoc(ref,'bazar',F.arrayUnion(e)).catch(x=>alert('সেভ হয়নি: '+x.message))},
       lock(d,id,a){F.updateDoc(ref,new F.FieldPath('days',d,'meals',id),a,new F.FieldPath('days',d,'lk',id),true).catch(e=>alert('সেভ হয়নি: '+e.message))},
@@ -1122,6 +1169,7 @@ if(window.FB&&FB.apiKey){
       if(snap.exists())S=Object.assign({members:[],days:{},bazar:[],deposits:[],extras:[],open:{},nd:{},cooks:[],needs:{},cm:{},cmu:{},cl:{}},snap.data());
       try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}
       window.cloudReady=true;
+      if(!window._pn){window._pn=1;setTimeout(()=>{try{if(localStorage.getItem('pushOn')==='1'&&Notification.permission==='granted'&&me&&localStorage.getItem('pushDay')!==today()){localStorage.setItem('pushDay',today());window.cloud.pushNote(true).catch(()=>{})}}catch(e){}},3000)}
       const el=document.activeElement;
       if(el&&/INPUT|SELECT|TEXTAREA/.test(el.tagName))pending=true;else render();
     },e=>alert('ডাটাবেসে সংযোগ হয়নি: '+e.message));
