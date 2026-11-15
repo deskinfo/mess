@@ -1070,21 +1070,21 @@ function pushState(){
   return on==='1'&&Notification.permission==='granted'?'on':'off'}
 let pushBusy=false;
 async function pushToggle(){
-  if(pushBusy||!window.cloud||!window.cloud.pushNote)return;
+  if(pushBusy||!window.cloud||!window.cloud.pushNote||pushState()==='on')return;
   pushBusy=true;render();
-  try{await window.cloud.pushNote(pushState()!=='on')}catch(e){alert(e.message||'নোটিফিকেশন চালু করা যায়নি')}
+  try{await window.cloud.pushNote(true)}catch(e){alert(e.message||'নোটিফিকেশন চালু করা যায়নি')}
   pushBusy=false;render()}
 function vPush(){
   if(!CLOUD||!role||!me)return '';
   const st=pushState();
   if(st==='nokey')return isM()?`<div class="card"><h2>নোটিফিকেশন</h2><p class="note" style="margin:0">এখনো সেটআপ হয়নি। config.js ফাইলে vapidKey যোগ করতে হবে।</p></div>`:'';
   const M={
-    on:['নোটিফিকেশন চালু আছে ✓','বাজারের দায়িত্ব, কমিউনিটির মেসেজ, মিল ও পরিচ্ছন্নতার রিমাইন্ডার এই ফোনে আসবে।','বন্ধ করুন'],
+    on:['নোটিফিকেশন চালু আছে ✓','বাজারের দায়িত্ব, কমিউনিটির মেসেজ, মিল ও পরিচ্ছন্নতার রিমাইন্ডার এই ফোনে আসবে।',''],
     off:['নোটিফিকেশন চালু করুন','বাজারের দায়িত্ব, মিল আপডেট, পরিচ্ছন্নতা আর কমিউনিটির খবর ফোনে পেতে চালু করুন।','চালু করুন'],
     denied:['নোটিফিকেশন বন্ধ করা আছে','ফোন বা ব্রাউজারের সেটিংসে এই সাইটের নোটিফিকেশন অনুমতি দিন, তারপর আবার চেষ্টা করুন।',''],
     na:['নোটিফিকেশন পাওয়া যাবে না','এই ডিভাইস বা ব্রাউজারে নোটিফিকেশন সাপোর্ট নেই। iPhone হলে সাইটটি হোম স্ক্রিনে যোগ করে সেখান থেকে খুলুন।','']
   }[st];
-  return `<div class="card"><h2>${M[0]}</h2><p class="note" style="margin:0 0 ${M[2]?10:0}px">${M[1]}</p>${M[2]?`<button class="btn${st==='on'?' alt':''}" style="width:100%" ${pushBusy?'disabled':''} onclick="pushToggle()">${pushBusy?'অপেক্ষা করুন…':M[2]}</button>`:''}</div>`}
+  return `<div class="card"><h2>${M[0]}</h2><p class="note" style="margin:0 0 ${M[2]?10:0}px">${M[1]}</p>${M[2]?`<button class="btn" style="width:100%" ${pushBusy?'disabled':''} onclick="pushToggle()">${pushBusy?'অপেক্ষা করুন…':M[2]}</button>`:''}</div>`}
 const pushBanner=()=>pushState()==='off'?vPush():'';
 /* লগইনের পর প্রথম ট্যাপে একবার নিজে থেকে নোটিফিকেশনের অনুমতি চায় (ব্রাউজার ট্যাপ ছাড়া অনুমতি চাইতে দেয় না) */
 let pushAuto=false;
