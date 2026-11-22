@@ -47,6 +47,11 @@ th{color:var(--mut);font-weight:500;font-size:14px}td.n,th.n{text-align:right}
 .big{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px}
 .big .bt{grid-column:1/-1}.big .bt p{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin:0;padding:6px 0}.big .bt p+p{border-top:1px dashed rgba(127,127,127,.35)}.big .bt p span{font-size:14px;color:var(--mut)}.big .bt p b{display:inline;font-size:20px}.big .bt .bt-r{border-top:1px solid rgba(127,127,127,.45)!important}
 .nd-l{flex:1;min-width:140px;display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--mut)}
+.nd-g{display:grid;grid-template-columns:1fr 1fr;gap:8px 14px;margin-bottom:8px}
+.nd-c{display:flex;flex-direction:column;gap:8px;min-width:0}
+.nd-p{display:flex;gap:8px;min-width:0}
+.nd-p input{min-width:0}.nd-p .nd-d{flex:1}.nd-p .nd-n{width:38%;flex:none}
+@media(max-width:560px){.nd-g{grid-template-columns:1fr}}
 .nd-i{display:flex;align-items:center;gap:10px;padding:10px 0;border-top:1px solid rgba(127,127,127,.25)}
 .nd-i:first-of-type{border-top:0}
 .nd-i .li-m{flex:1;min-width:0}.nd-i .li-m b{overflow-wrap:anywhere}.nd-i .li-m small{font-weight:400;color:var(--mut)}
@@ -685,7 +690,7 @@ function vNeeds(){
     <div class="nd-a">${can?`<button class="btn alt nd-b" onclick="togNeed('${n.id}')">${n.done?'আবার বাকি':'কেনা হয়েছে'}</button>`:''}<button class="x" aria-label="মুছুন" onclick="delNeed('${n.id}')">×</button></div></div>`};
   const sel=needTo||(me&&S.members.some(x=>x.id===me)?me:'')||(S.members[0]&&S.members[0].id)||'';
   return `<div class="card"><h2>বাসায় কি কি লাগবে?${all.length?` <small style="font-weight:400">— বাকি ${bn(left)}টি</small>`:''}</h2>
-  ${`<div class="row"><input id="ni" placeholder="কী লাগবে (যেমন: চাল, তেল)" style="flex:1;min-width:140px"><input id="nq" placeholder="পরিমাণ (ঐচ্ছিক)" style="width:130px"></div>
+  ${`<div class="nd-g">${[0,1].map(c=>`<div class="nd-c">${[0,1,2].map(r=>{const k=c*3+r+1;return `<div class="nd-p"><input id="ni${k}" class="nd-d" placeholder="বিবরণ" autocomplete="off"><input id="nq${k}" class="nd-n" placeholder="পরিমাণ" autocomplete="off"></div>`}).join('')}</div>`).join('')}</div>
   <div class="row"><label class="nd-l">১ম দায়িত্বপ্রাপ্ত<select id="nt" onchange="needTo=this.value" style="width:100%">${S.members.map(x=>`<option value="${x.id}" ${sel===x.id?'selected':''}>${esc(x.name)}</option>`).join('')}</select></label>
   <label class="nd-l">২য় দায়িত্বপ্রাপ্ত (ঐচ্ছিক)<select id="nt2" onchange="needTo2=this.value" style="width:100%"><option value="">— কেউ নেই —</option>${S.members.map(x=>`<option value="${x.id}" ${needTo2===x.id?'selected':''}>${esc(x.name)}</option>`).join('')}</select></label></div>
   <div class="row"><button class="btn" style="width:100%" onclick="addNeed()">যোগ করুন</button></div>
@@ -693,13 +698,21 @@ function vNeeds(){
   ${all.map(row).join('')||'<div class="empty">এখন কিছু লাগবে না</div>'}</div>`;
 }
 function addNeed(){
-  if(!role)return;const item=bazarV('ni').trim(),to=bazarV('nt'),to2=bazarV('nt2');
-  if(!item){alert('কী লাগবে লিখুন');return}
+  if(!role)return;const to=bazarV('nt'),to2=bazarV('nt2'),rows=[];
+  for(let k=1;k<=6;k++){
+    const item=bazarV('ni'+k).trim(),qty=bazarV('nq'+k).trim();
+    if(item)rows.push({item,qty});
+    else if(qty){alert('পরিমাণ লিখেছেন কিন্তু বিবরণ লেখা হয়নি');return}
+  }
+  if(!rows.length){alert('অন্তত একটি বিবরণ লিখুন');return}
   if(!to){alert('অন্তত একজন দায়িত্বপ্রাপ্ত ব্যক্তি বেছে নিন');return}
   if(to2&&to2===to){alert('একই ব্যক্তিকে দুইবার দেওয়া যাবে না');return}
-  const id=uid();S.needs=S.needs||{};const e=S.needs[id]={id,item,qty:bazarV('nq').trim(),tos:to2?[to,to2]:[to],done:false,t:Date.now()};
+  S.needs=S.needs||{};const t0=Date.now();
+  const list=rows.map((r,k)=>{const id=uid();return S.needs[id]={id,item:r.item,qty:r.qty,tos:to2?[to,to2]:[to],done:false,t:t0+k}});
   needTo2='';try{localStorage.setItem(KEY,JSON.stringify(S))}catch(x){}
-  if(CLOUD&&window.cloud&&window.cloud.needAdd)window.cloud.needAdd(id,e);else save();
+  if(CLOUD&&window.cloud&&window.cloud.needAddMany)window.cloud.needAddMany(list);
+  else if(CLOUD&&window.cloud&&window.cloud.needAdd)list.forEach(e=>window.cloud.needAdd(e.id,e));
+  else save();
   render()}
 function togNeed(id){
   const n=S.needs&&S.needs[id];if(!n)return;if(!role)return;
@@ -1144,6 +1157,7 @@ if(window.FB&&FB.apiKey){
       cm(id,e,tks){const a=[ref,new F.FieldPath('cm',id),e];tks.forEach(t=>a.push(new F.FieldPath('cmu',t),true));F.updateDoc(...a).then(pingW).catch(x=>alert('সেভ হয়নি: '+x.message))},
       menu(d,l,n,saved){F.updateDoc(ref,new F.FieldPath('days',d,'menu','l'),l,new F.FieldPath('days',d,'menu','n'),n,new F.FieldPath('days',d,'menuSaved'),saved).catch(e=>alert('সেভ হয়নি: '+e.message))},
       needAdd(id,e){F.updateDoc(ref,new F.FieldPath('needs',id),e).then(pingW).catch(x=>alert('সেভ হয়নি: '+x.message))},
+      needAddMany(list){const a=[ref];list.forEach(e=>{a.push(new F.FieldPath('needs',e.id),e)});F.updateDoc(...a).then(pingW).catch(x=>alert('সেভ হয়নি: '+x.message))},
       needDel(id){F.updateDoc(ref,new F.FieldPath('needs',id),F.deleteField()).catch(x=>alert('সেভ হয়নি: '+x.message))},
       async pushNote(on){
         const mid=me;
